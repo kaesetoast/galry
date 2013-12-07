@@ -1,0 +1,23 @@
+{
+  "name": "galry",
+  "description": "A simple HTML5 image gallery",
+  "version": "0.0.1",
+  "author": {
+    "name": "Philipp Nowinski",
+    "email": "philipp@nowinski.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaesetoast/galry.git"
+  },
+  "devDependencies": {
+    "grunt": "0.4.x",
+    "grunt-contrib": "0.7.x"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/kaesetoast/galry/raw/master/LICENSE"
+    }
+  ]
+}
