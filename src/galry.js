@@ -16,7 +16,8 @@
                 elementsClassName: 'gal-item',
                 maximizedLayerHiddenClassName: 'hidden',
                 maximizedLayerClassName: 'gal-maximized-layer',
-            }
+            },
+            autoPreloading: true
         };
 
     function galry(_galleryIdentifier, _options) {
@@ -46,11 +47,17 @@
         maximizedImage.classList.add(options.styles.elementsClassName);
         maximizedLayer.appendChild(maximizedImage);
         initEventListeners();
+        if (options.autoPreloading) {
+            galry.preload();
+        }
     }
 
     galry.maximize = function (_item) {
+        if (typeof _item === 'number') {
+            _item = galleryItems[_item];
+        }
         maximizedImage.src = _item.href;
-        currentMaximizedItemId = _item.getAttribute('data-id');
+        currentMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
         maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
     };
 
@@ -67,16 +74,41 @@
                 currentMaximizedItemId++;
             }
             galry.maximize(galleryItems[currentMaximizedItemId]);
+            var evnt = new CustomEvent('nextItem', {
+                detail: {
+                    currentMaximizedItemId: currentMaximizedItemId
+                }
+            });
+            galleryWrapper.dispatchEvent(evnt);
         }
     };
 
     galry.prev = function() {
-        if (currentMaximizedItemId <= 0) {
-            currentMaximizedItemId = galleryItems.length - 1;
-        } else {
-            currentMaximizedItemId--;
+        if (currentMaximizedItemId !== null) {
+            if (currentMaximizedItemId <= 0) {
+                currentMaximizedItemId = galleryItems.length - 1;
+            } else {
+                currentMaximizedItemId--;
+            }
+            galry.maximize(galleryItems[currentMaximizedItemId]);
+            var evnt = new CustomEvent('prevItem', {
+                detail: {
+                    currentMaximizedItemId: currentMaximizedItemId
+                }
+            });
+            galleryWrapper.dispatchEvent(evnt);
         }
-        galry.maximize(galleryItems[currentMaximizedItemId]);
+    };
+
+    galry.preload = function() {
+        for (var i = galleryItems.length - 1; i >= 0; i--) {
+            var image = new Image();
+            image.src = galleryItems[i].href;
+        }
+    };
+
+    galry.addEventListener = function(eventName, callback) {
+        galleryWrapper.addEventListener(eventName, callback);
     };
 
     function maximizeClick (e) {
@@ -102,6 +134,20 @@
                 galry.next();
             } else if (e.keyCode == 37 || e.keyCode == 40) {
                 galry.prev();
+            }
+        });
+        document.addEventListener('mousewheel', function(e) {
+            if (e.wheelDeltaY > 0) {
+                galry.next();
+            } else {
+                galry.prev();
+            }
+        });
+        maximizedLayer.addEventListener('click', function(e) {
+            // check if click occured on the layer itself to prevent unwanted minimizing
+            // when clicking on child elements
+            if (e.target === maximizedLayer) {
+                galry.minimize();
             }
         });
     }
