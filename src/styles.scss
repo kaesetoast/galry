@@ -1,0 +1,22 @@
+li {
+    display: inline-block;
+}
+
+.gal-maximized-layer {
+    background-color: rgba(0, 0, 0, 0.9);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: table-cell;
+    vertical-align: middle;
+    &.hidden {
+        display: none;
+    }
+    .gal-item {
+        display: block;
+        margin: 2em auto;
+        vertical-align: middle;
+    }
+}

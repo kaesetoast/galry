@@ -8,6 +8,16 @@ module.exports = function(grunt) {
             all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
         },
 
+        compass: {
+            dev: {
+                options: {
+                    sassDir: 'src',
+                    cssDir: 'dist',
+                    outputStyle: 'compressed'
+                }
+            }
+        },
+
         uglify: {
             all: {
                 files: {
@@ -17,12 +27,16 @@ module.exports = function(grunt) {
         },
 
         watch: {
-            all: {
+            js: {
                 files: ['src/*.js', 'demo/*.html'],
-                tasks: ['jshint', 'uglify'],
-                options: {
-                    livereload: 35729
-                }
+                tasks: ['jshint', 'uglify']
+            },
+            css: {
+                files: ['src/*scss'],
+                tasks: ['compass']
+            },
+            options: {
+                livereload: 35729
             }
         }
 
