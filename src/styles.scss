@@ -31,6 +31,7 @@ li {
             &.gal-next-max, &.gal-prev-max {
                 position: absolute;
                 top: 0;
+                opacity: 0;
             }
             &.gal-prev-max {
                 @include transform(translateX(-150%) scale(0.7));
