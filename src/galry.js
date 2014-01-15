@@ -51,6 +51,7 @@
             maximizedGalleryItems.push(item);
             item.appendChild(image);
             item.classList.add(options.styles.elementsClassName);
+            image.addEventListener('load', setImageMaxDimensions);
             image.src = galleryItems[i].href;
         }
         // create fullscreen layer
@@ -113,6 +114,12 @@
     galry.addEventListener = function(eventName, callback) {
         galleryWrapper.addEventListener(eventName, callback);
     };
+
+    function setImageMaxDimensions(_event) {
+        var image = _event.target;
+        image.style.maxHeight = image.naturalHeight + 'px';
+        image.style.maxWidth = image.naturalWidth + 'px';
+    }
 
     function getNextItemId(_currentItemId) {
         if (_currentItemId + 1 >= galleryItems.length) {

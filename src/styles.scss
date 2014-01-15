@@ -22,6 +22,7 @@ li {
             img {
                 margin: 2em auto;
                 display: block;
+                width: 90%;
             }
             @include transition(all 0.5s ease);
             &.gal-current-max, &.gal-next-max, &.gal-prev-max {
