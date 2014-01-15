@@ -15,8 +15,11 @@ li {
         display: none;
     }
     .gal-item {
-        display: block;
+        display: none;
         margin: 2em auto;
         vertical-align: middle;
+        &.gal-current-max {
+            display: block;
+        }
     }
 }

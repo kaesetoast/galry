@@ -8,14 +8,18 @@
 
     var galleryWrapper,
         galleryItems,
+        maximizedGallery = document.createElement('ul'),
+        maximizedGalleryItems = [],
         maximizedLayer = document.createElement('div'),
-        maximizedImage = document.createElement('img'),
-        currentMaximizedItemId = null,
+        currentMaximizedItemId = 0,
         options = {
             styles: {
                 elementsClassName: 'gal-item',
                 maximizedLayerHiddenClassName: 'hidden',
                 maximizedLayerClassName: 'gal-maximized-layer',
+                currentMaximizedImageClassName: 'gal-current-max',
+                nextMaximizedImageClassName: 'gal-next-max',
+                prevMaximizedImageClassName: 'gal-prev-max'
             },
             autoPreloading: true
         };
@@ -36,75 +40,72 @@
     };
 
     function initGallery () {
+        // fetch and set up gallery items
         galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
-        for (var i = galleryItems.length - 1; i >= 0; i--) {
+        for (var i = 0; i < galleryItems.length; i++) {
             galleryItems[i].addEventListener('click', maximizeClick, false);
             galleryItems[i].setAttribute('data-id', i);
+            var item = document.createElement('li'),
+                image = document.createElement('img');
+            maximizedGallery.appendChild(item);
+            maximizedGalleryItems.push(item);
+            item.appendChild(image);
+            item.classList.add(options.styles.elementsClassName);
+            image.src = galleryItems[i].href;
         }
+        // create fullscreen layer
         maximizedLayer.classList.add(options.styles.maximizedLayerClassName);
         maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
         document.body.appendChild(maximizedLayer);
-        maximizedImage.classList.add(options.styles.elementsClassName);
-        maximizedLayer.appendChild(maximizedImage);
+        maximizedLayer.appendChild(maximizedGallery);
+        // events
         initEventListeners();
-        if (options.autoPreloading) {
-            galry.preload();
-        }
     }
 
     galry.maximize = function (_item) {
         if (typeof _item === 'number') {
             _item = galleryItems[_item];
         }
-        maximizedImage.src = _item.href;
+        maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
         currentMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
+        maximizedGalleryItems[currentMaximizedItemId].classList.add(options.styles.currentMaximizedImageClassName);
         maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
     };
 
     galry.minimize = function () {
-        currentMaximizedItemId = null;
         maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
     };
 
     galry.next = function() {
-        if (currentMaximizedItemId !== null) {
-            if (currentMaximizedItemId + 1 >= galleryItems.length) {
-                currentMaximizedItemId = 0;
-            } else {
-                currentMaximizedItemId++;
-            }
-            galry.maximize(galleryItems[currentMaximizedItemId]);
-            var evnt = new CustomEvent('nextItem', {
-                detail: {
-                    currentMaximizedItemId: currentMaximizedItemId
-                }
-            });
-            galleryWrapper.dispatchEvent(evnt);
+        var nextItem;
+        if (currentMaximizedItemId + 1 >= galleryItems.length) {
+            nextItem = 0;
+        } else {
+            nextItem = currentMaximizedItemId + 1;
         }
+        galry.maximize(galleryItems[nextItem]);
+        var evnt = new CustomEvent('nextItem', {
+            detail: {
+                currentMaximizedItemId: nextItem
+            }
+        });
+        galleryWrapper.dispatchEvent(evnt);
     };
 
     galry.prev = function() {
-        if (currentMaximizedItemId !== null) {
-            if (currentMaximizedItemId <= 0) {
-                currentMaximizedItemId = galleryItems.length - 1;
-            } else {
-                currentMaximizedItemId--;
+        var nextItem;
+        if (currentMaximizedItemId <= 0) {
+            nextItem = galleryItems.length - 1;
+        } else {
+            nextItem = currentMaximizedItemId - 1;
+        }
+        galry.maximize(galleryItems[nextItem]);
+        var evnt = new CustomEvent('prevItem', {
+            detail: {
+                currentMaximizedItemId: nextItem
             }
-            galry.maximize(galleryItems[currentMaximizedItemId]);
-            var evnt = new CustomEvent('prevItem', {
-                detail: {
-                    currentMaximizedItemId: currentMaximizedItemId
-                }
-            });
-            galleryWrapper.dispatchEvent(evnt);
-        }
-    };
-
-    galry.preload = function() {
-        for (var i = galleryItems.length - 1; i >= 0; i--) {
-            var image = new Image();
-            image.src = galleryItems[i].href;
-        }
+        });
+        galleryWrapper.dispatchEvent(evnt);
     };
 
     galry.addEventListener = function(eventName, callback) {
@@ -138,9 +139,9 @@
         });
         document.addEventListener('mousewheel', function(e) {
             if (e.wheelDeltaY > 0) {
-                galry.next();
-            } else {
                 galry.prev();
+            } else {
+                galry.next();
             }
         });
         maximizedLayer.addEventListener('click', function(e) {
