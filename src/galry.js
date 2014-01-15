@@ -66,9 +66,17 @@
         if (typeof _item === 'number') {
             _item = galleryItems[_item];
         }
+        // remove old classes
         maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
+        maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.remove(options.styles.prevMaximizedImageClassName);
+        maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.remove(options.styles.nextMaximizedImageClassName);
+        // set the new current index
         currentMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
+        // set new classes
         maximizedGalleryItems[currentMaximizedItemId].classList.add(options.styles.currentMaximizedImageClassName);
+        maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.add(options.styles.prevMaximizedImageClassName);
+        maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.add(options.styles.nextMaximizedImageClassName);
+        // show maximized layer
         maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
     };
 
@@ -77,12 +85,7 @@
     };
 
     galry.next = function() {
-        var nextItem;
-        if (currentMaximizedItemId + 1 >= galleryItems.length) {
-            nextItem = 0;
-        } else {
-            nextItem = currentMaximizedItemId + 1;
-        }
+        var nextItem = getNextItemId(currentMaximizedItemId);
         galry.maximize(galleryItems[nextItem]);
         var evnt = new CustomEvent('nextItem', {
             detail: {
@@ -93,12 +96,7 @@
     };
 
     galry.prev = function() {
-        var nextItem;
-        if (currentMaximizedItemId <= 0) {
-            nextItem = galleryItems.length - 1;
-        } else {
-            nextItem = currentMaximizedItemId - 1;
-        }
+        var nextItem = getPrevItemId(currentMaximizedItemId);
         galry.maximize(galleryItems[nextItem]);
         var evnt = new CustomEvent('prevItem', {
             detail: {
@@ -111,6 +109,22 @@
     galry.addEventListener = function(eventName, callback) {
         galleryWrapper.addEventListener(eventName, callback);
     };
+
+    function getNextItemId(_currentItemId) {
+        if (_currentItemId + 1 >= galleryItems.length) {
+            return 0;
+        } else {
+            return _currentItemId + 1;
+        }
+    }
+
+    function getPrevItemId(_currentItemId) {
+        if (_currentItemId <= 0) {
+            return galleryItems.length - 1;
+        } else {
+            return _currentItemId - 1;
+        }
+    }
 
     function maximizeClick (e) {
         e.preventDefault();
