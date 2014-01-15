@@ -12,8 +12,7 @@ var galleryWrapper,
             currentMaximizedImageClassName: 'gal-current-max',
             nextMaximizedImageClassName: 'gal-next-max',
             prevMaximizedImageClassName: 'gal-prev-max'
-        },
-        autoPreloading: true
+        }
     };
 
 function galry(_galleryIdentifier, _options) {
