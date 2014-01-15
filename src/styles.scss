@@ -11,29 +11,32 @@ li {
     position: absolute;
     top: 0;
     left: 0;
-    display: table-cell;
-    vertical-align: middle;
     overflow: hidden;
     &.hidden {
         display: none;
     }
-    .gal-item {
-        display: none;
-        margin: 2em auto;
-        vertical-align: middle;
-        @include transition(all 0.2s ease);
-        &.gal-current-max, &.gal-next-max, &.gal-prev-max {
-            display: block;
-        }
-        &.gal-next-max, &.gal-prev-max {
-            position: absolute;
-            top: 0;
-        }
-        &.gal-prev-max {
-            @include transform(translateX(-150%) scale(0.7));
-        }
-        &.gal-next-max {
-            @include transform(translateX(150%) scale(0.7));
+    ul {
+        padding: 0;
+        .gal-item {
+            display: none;
+            img {
+                margin: 2em auto;
+                display: block;
+            }
+            @include transition(all 0.5s ease);
+            &.gal-current-max, &.gal-next-max, &.gal-prev-max {
+                display: block;
+            }
+            &.gal-next-max, &.gal-prev-max {
+                position: absolute;
+                top: 0;
+            }
+            &.gal-prev-max {
+                @include transform(translateX(-150%) scale(0.7));
+            }
+            &.gal-next-max {
+                @include transform(translateX(150%) scale(0.7));
+            }
         }
     }
 }
