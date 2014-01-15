@@ -6,6 +6,11 @@
 
 'use strict';
 
+/**
+ * Maximize the given item
+ * 
+ * @param  {mixed} _item the item itself, or its id
+ */
 galry.maximize = function (_item) {
     if (typeof _item === 'number') {
         _item = galleryItems[_item];
@@ -24,10 +29,16 @@ galry.maximize = function (_item) {
     maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
 };
 
+/**
+ * Minimize the gallery
+ */
 galry.minimize = function () {
     maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
 };
 
+/**
+ * Maximize the next item in line
+ */
 galry.next = function() {
     if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
         var nextItem = getNextItemId(currentMaximizedItemId);
@@ -41,6 +52,9 @@ galry.next = function() {
     }
 };
 
+/**
+ * Maximize the previous item in line
+ */
 galry.prev = function() {
     if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
         var nextItem = getPrevItemId(currentMaximizedItemId);
@@ -54,6 +68,12 @@ galry.prev = function() {
     }
 };
 
+/**
+ * Get the ID of the next item in line
+ * 
+ * @param  {Number} _currentItemId The ID of the currently maximized item
+ * @return {Number}                The ID of the next item in line
+ */
 function getNextItemId(_currentItemId) {
     if (_currentItemId + 1 >= galleryItems.length) {
         return 0;
@@ -62,6 +82,12 @@ function getNextItemId(_currentItemId) {
     }
 }
 
+/**
+ * Get the ID of the previous item in line
+ * 
+ * @param  {Number} _currentItemId The ID of the currently maximized item
+ * @return {Number}                The ID of the previous item in line
+ */
 function getPrevItemId(_currentItemId) {
     if (_currentItemId <= 0) {
         return galleryItems.length - 1;
@@ -70,11 +96,20 @@ function getPrevItemId(_currentItemId) {
     }
 }
 
+/**
+ * Click handler for maximizing items
+ * 
+ * @return {[type]}   [description]
+ */
 function maximizeClick (e) {
     e.preventDefault();
     galry.maximize(e.currentTarget);
 }
 
+/**
+ * Handler for mouseWheel
+ * @param  {event} _event The mousewheel event
+ */
 function mouseWheelMove(_event) {
     _event.preventDefault();
     if (Math.max(-1, Math.min(1, (_event.wheelDelta || -_event.detail))) > 0) {
@@ -100,6 +135,13 @@ var galleryWrapper,
         }
     };
 
+/**
+ * Constructor function
+ * 
+ * @param  {mixed}  _galleryIdentifier the DOM Node that contains the gallery or its id-string
+ * @param  {object} _options           the configuration object
+ * @return {Function}                    the api object
+ */
 function galry(_galleryIdentifier, _options) {
     galry.setOptions(_options);
     galleryWrapper = fetchGalleryElement(_galleryIdentifier);
@@ -107,6 +149,11 @@ function galry(_galleryIdentifier, _options) {
     return galry;
 }
 
+/**
+ * Set custom options. This function will merge your custom options with the default ones
+ * 
+ * @param {object} _options the option object
+ */
 galry.setOptions = function(_options) {
     for (var option in _options) {
         if (options[option]) {
@@ -115,6 +162,9 @@ galry.setOptions = function(_options) {
     }
 };
 
+/**
+ * Initialize the gallery
+ */
 function initGallery () {
     // fetch and set up gallery items
     galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
@@ -139,17 +189,35 @@ function initGallery () {
     initEventListeners();
 }
 
-
+/**
+ * Add a listener for the galry events
+ * 
+ * @param {string}   eventName the name of the event
+ * @param {Function} callback
+ */
 galry.addEventListener = function(eventName, callback) {
     galleryWrapper.addEventListener(eventName, callback);
 };
 
+/**
+ * Set max-width and max-height to the exact dimensions of the image
+ * This function should be called through an onLoad listener on the image
+ * 
+ * @param {event} _event the onLoad event
+ */
 function setImageMaxDimensions(_event) {
     var image = _event.target;
     image.style.maxHeight = image.naturalHeight + 'px';
     image.style.maxWidth = image.naturalWidth + 'px';
 }
 
+/**
+ * This function fetches the gallery element by id-string or through
+ * the correspponding DOM Node
+ * 
+ * @param  {[type]} _galleryIdentifier [description]
+ * @return {[type]}                    [description]
+ */
 function fetchGalleryElement(_galleryIdentifier) {
     if (typeof _galleryIdentifier === 'string') {
         return document.getElementById(_galleryIdentifier);
@@ -160,6 +228,9 @@ function fetchGalleryElement(_galleryIdentifier) {
     }
 }
 
+/**
+ * Initialize event listeners
+ */
 function initEventListeners() {
     document.addEventListener('keydown', function (e) {
         if (e.keyCode == 27) {

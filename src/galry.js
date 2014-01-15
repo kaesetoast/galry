@@ -15,6 +15,13 @@ var galleryWrapper,
         }
     };
 
+/**
+ * Constructor function
+ * 
+ * @param  {mixed}  _galleryIdentifier the DOM Node that contains the gallery or its id-string
+ * @param  {object} _options           the configuration object
+ * @return {Function}                    the api object
+ */
 function galry(_galleryIdentifier, _options) {
     galry.setOptions(_options);
     galleryWrapper = fetchGalleryElement(_galleryIdentifier);
@@ -22,6 +29,11 @@ function galry(_galleryIdentifier, _options) {
     return galry;
 }
 
+/**
+ * Set custom options. This function will merge your custom options with the default ones
+ * 
+ * @param {object} _options the option object
+ */
 galry.setOptions = function(_options) {
     for (var option in _options) {
         if (options[option]) {
@@ -30,6 +42,9 @@ galry.setOptions = function(_options) {
     }
 };
 
+/**
+ * Initialize the gallery
+ */
 function initGallery () {
     // fetch and set up gallery items
     galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
@@ -54,17 +69,35 @@ function initGallery () {
     initEventListeners();
 }
 
-
+/**
+ * Add a listener for the galry events
+ * 
+ * @param {string}   eventName the name of the event
+ * @param {Function} callback
+ */
 galry.addEventListener = function(eventName, callback) {
     galleryWrapper.addEventListener(eventName, callback);
 };
 
+/**
+ * Set max-width and max-height to the exact dimensions of the image
+ * This function should be called through an onLoad listener on the image
+ * 
+ * @param {event} _event the onLoad event
+ */
 function setImageMaxDimensions(_event) {
     var image = _event.target;
     image.style.maxHeight = image.naturalHeight + 'px';
     image.style.maxWidth = image.naturalWidth + 'px';
 }
 
+/**
+ * This function fetches the gallery element by id-string or through
+ * the correspponding DOM Node
+ * 
+ * @param  {[type]} _galleryIdentifier [description]
+ * @return {[type]}                    [description]
+ */
 function fetchGalleryElement(_galleryIdentifier) {
     if (typeof _galleryIdentifier === 'string') {
         return document.getElementById(_galleryIdentifier);
@@ -75,6 +108,9 @@ function fetchGalleryElement(_galleryIdentifier) {
     }
 }
 
+/**
+ * Initialize event listeners
+ */
 function initEventListeners() {
     document.addEventListener('keydown', function (e) {
         if (e.keyCode == 27) {
