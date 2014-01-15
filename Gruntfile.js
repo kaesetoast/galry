@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         jshint: {
-            all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
+            all: ['src/**/*.js', 'test/**/*.js']
         },
 
         compass: {
@@ -18,10 +18,27 @@ module.exports = function(grunt) {
             }
         },
 
+        concat: {
+            options: {
+                banner: '(function(root, factory) {\n'
+                        + '    if (typeof define === \'function\' && define.amd) define(factory);\n'
+                        + '    else if (typeof exports === \'object\') module.exports = factory();\n'
+                        + '    else root.galry = factory()\n'
+                        + '}(this, function() {\n'
+                        + '\n\'use strict\';\n\n',
+                footer: '\n\nreturn galry;\n'
+                        +'}));'
+            },
+            dist: {
+                src : ['src/*.js'],
+                dest: 'dist/galry.js'
+            }
+        },
+
         uglify: {
             all: {
                 files: {
-                    'dist/galry.min.js': 'src/galry.js'
+                    'dist/galry.min.js': 'dist/galry.js'
                 }
             }
         },
@@ -44,6 +61,6 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib');
 
-    grunt.registerTask('default', ['jshint', 'uglify', 'watch']);
+    grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'watch']);
 
 };
