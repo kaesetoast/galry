@@ -1,3 +1,5 @@
+@import "compass/css3";
+
 li {
     display: inline-block;
 }
@@ -11,6 +13,7 @@ li {
     left: 0;
     display: table-cell;
     vertical-align: middle;
+    overflow: hidden;
     &.hidden {
         display: none;
     }
@@ -18,8 +21,19 @@ li {
         display: none;
         margin: 2em auto;
         vertical-align: middle;
-        &.gal-current-max {
+        @include transition(all 0.2s ease);
+        &.gal-current-max, &.gal-next-max, &.gal-prev-max {
             display: block;
+        }
+        &.gal-next-max, &.gal-prev-max {
+            position: absolute;
+            top: 0;
+        }
+        &.gal-prev-max {
+            @include transform(translateX(-150%) scale(0.7));
+        }
+        &.gal-next-max {
+            @include transform(translateX(150%) scale(0.7));
         }
     }
 }
