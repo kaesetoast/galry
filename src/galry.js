@@ -85,25 +85,29 @@
     };
 
     galry.next = function() {
-        var nextItem = getNextItemId(currentMaximizedItemId);
-        galry.maximize(galleryItems[nextItem]);
-        var evnt = new CustomEvent('nextItem', {
-            detail: {
-                currentMaximizedItemId: nextItem
-            }
-        });
-        galleryWrapper.dispatchEvent(evnt);
+        if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
+            var nextItem = getNextItemId(currentMaximizedItemId);
+            galry.maximize(galleryItems[nextItem]);
+            var evnt = new CustomEvent('nextItem', {
+                detail: {
+                    currentMaximizedItemId: nextItem
+                }
+            });
+            galleryWrapper.dispatchEvent(evnt);
+        }
     };
 
     galry.prev = function() {
-        var nextItem = getPrevItemId(currentMaximizedItemId);
-        galry.maximize(galleryItems[nextItem]);
-        var evnt = new CustomEvent('prevItem', {
-            detail: {
-                currentMaximizedItemId: nextItem
-            }
-        });
-        galleryWrapper.dispatchEvent(evnt);
+        if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
+            var nextItem = getPrevItemId(currentMaximizedItemId);
+            galry.maximize(galleryItems[nextItem]);
+            var evnt = new CustomEvent('prevItem', {
+                detail: {
+                    currentMaximizedItemId: nextItem
+                }
+            });
+            galleryWrapper.dispatchEvent(evnt);
+        }
     };
 
     galry.addEventListener = function(eventName, callback) {
