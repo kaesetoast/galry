@@ -171,12 +171,12 @@ function initEventListeners() {
             galry.prev();
         }
     });
-    document.addEventListener('DOMMouseScroll', mouseWheelMove);
-    document.addEventListener('mousewheel', mouseWheelMove);
+    maximizedLayer.addEventListener('DOMMouseScroll', mouseWheelMove);
+    maximizedLayer.addEventListener('mousewheel', mouseWheelMove);
     maximizedLayer.addEventListener('click', function(e) {
-        // check if click occured on the layer itself to prevent unwanted minimizing
-        // when clicking on child elements
-        if (e.target === maximizedLayer) {
+        // check if that the click did not appear on the image
+        // to prevent unwanted closing
+        if (e.target.nodeName !== 'IMG') {
             galry.minimize();
         }
     });
