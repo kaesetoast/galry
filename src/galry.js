@@ -152,6 +152,15 @@
         }
     }
 
+    function mouseWheelMove(_event) {
+        _event.preventDefault();
+        if (Math.max(-1, Math.min(1, (_event.wheelDelta || -_event.detail))) > 0) {
+            galry.prev();
+        } else {
+            galry.next();
+        }
+    }
+
     function initEventListeners() {
         document.addEventListener('keydown', function (e) {
             if (e.keyCode == 27) {
@@ -162,13 +171,8 @@
                 galry.prev();
             }
         });
-        document.addEventListener('mousewheel', function(e) {
-            if (e.wheelDeltaY > 0) {
-                galry.prev();
-            } else {
-                galry.next();
-            }
-        });
+        document.addEventListener('DOMMouseScroll', mouseWheelMove);
+        document.addEventListener('mousewheel', mouseWheelMove);
         maximizedLayer.addEventListener('click', function(e) {
             // check if click occured on the layer itself to prevent unwanted minimizing
             // when clicking on child elements
