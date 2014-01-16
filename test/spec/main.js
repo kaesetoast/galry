@@ -15,7 +15,7 @@ function setUpMarkup() {
     document.body.appendChild(galleryElement);
 }
 
-describe('main', function() {
+describe('main - constructor tests', function() {
     var gallery;
 
     beforeEach(function() {
@@ -28,7 +28,7 @@ describe('main', function() {
     });
 
     describe('test constructor', function() {
-        
+
         it('should be able to create galry by id-string', function() {
             gallery = new galry('gallery');
             expect(document.getElementById('gallery')).toEqual(gallery.getGalleryDomNode());
@@ -41,4 +41,34 @@ describe('main', function() {
         });
 
     });
+});
+
+describe('main - test the rest', function() {
+    var gallery;
+
+    beforeEach(function() {
+        setUpMarkup();
+        gallery = new galry('gallery');
+    });
+
+    afterEach(function() {
+        gallery.destroy();
+        document.body.removeChild(document.getElementById('gallery'));
+    });
+
+    describe('check creation and destruction of DOM Elements', function() {
+
+        it('should create the maximized layer', function() {
+            expect(document.getElementsByClassName('gal-maximized-layer').length).toBeGreaterThan(0);
+        });
+
+        it('should remove the maximized layer after destroy call', function() {
+            gallery.destroy();
+            expect(document.getElementsByClassName('gal-maximized-layer').length).toBe(0);
+            // workaround to prevent afterEach to fail
+            gallery = new galry('gallery');
+        });
+
+    });
+
 });
