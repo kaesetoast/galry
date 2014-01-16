@@ -1,27 +1,14 @@
 describe('controls', function() {
-    var gallery,
-        galleryElement;
+    var gallery;
 
     beforeEach(function() {
-        galleryElement = document.createElement('ul');
-        for (var i = 9; i--;) {
-            var li = document.createElement('li'),
-                anchor = document.createElement('a'),
-                image = document.createElement('img');
-            anchor.href = 'http://lorempixel.com/1024/768/cats/' + i;
-            anchor.classList.add('gal-item');
-            image.src = 'http://lorempixel.com/250/150/cats/' +i;
-            li.appendChild(anchor);
-            anchor.appendChild(image);
-            galleryElement.appendChild(li);
-        }
-        document.body.appendChild(galleryElement);
-        gallery = new galry(galleryElement);
+        setUpMarkup();
+        gallery = new galry('gallery');
     });
 
     afterEach(function() {
         gallery.destroy();
-        document.body.removeChild(galleryElement);
+        document.body.removeChild(document.getElementById('gallery'));
     });
 
     it('should be able to move to next slide', function() {

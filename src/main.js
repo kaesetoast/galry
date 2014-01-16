@@ -47,6 +47,10 @@ galry.destroy = function() {
     document.body.removeChild(maximizedLayer);
 };
 
+galry.getGalleryDomNode = function() {
+    return galleryWrapper;
+};
+
 /**
  * Initialize the gallery
  */
