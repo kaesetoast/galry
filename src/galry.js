@@ -42,6 +42,11 @@ galry.setOptions = function(_options) {
     }
 };
 
+galry.destroy = function() {
+    removeEventListeners();
+    document.body.removeChild(maximizedLayer);
+};
+
 /**
  * Initialize the gallery
  */
@@ -108,26 +113,37 @@ function fetchGalleryElement(_galleryIdentifier) {
     }
 }
 
+function handleKeyDownEvents(_event) {
+    if (_event.keyCode == 27) {
+        galry.minimize();
+    } else if (_event.keyCode == 38 || _event.keyCode == 39) {
+        galry.next();
+    } else if (_event.keyCode == 37 || _event.keyCode == 40) {
+        galry.prev();
+    }
+}
+
+function handleClickOnMaximizedLayer(_event) {
+    // check if that the click did not appear on the image
+    // to prevent unwanted closing
+    if (_event.target.nodeName !== 'IMG') {
+        galry.minimize();
+    }
+}
+
 /**
  * Initialize event listeners
  */
 function initEventListeners() {
-    document.addEventListener('keydown', function (e) {
-        if (e.keyCode == 27) {
-            galry.minimize();
-        } else if (e.keyCode == 38 || e.keyCode == 39) {
-            galry.next();
-        } else if (e.keyCode == 37 || e.keyCode == 40) {
-            galry.prev();
-        }
-    });
+    document.addEventListener('keydown', handleKeyDownEvents);
     maximizedLayer.addEventListener('DOMMouseScroll', mouseWheelMove);
     maximizedLayer.addEventListener('mousewheel', mouseWheelMove);
-    maximizedLayer.addEventListener('click', function(e) {
-        // check if that the click did not appear on the image
-        // to prevent unwanted closing
-        if (e.target.nodeName !== 'IMG') {
-            galry.minimize();
-        }
-    });
+    maximizedLayer.addEventListener('click', handleClickOnMaximizedLayer);
+}
+
+function removeEventListeners() {
+    document.removeEventListener('keydown', handleKeyDownEvents);
+    maximizedLayer.removeEventListener('DOMMouseScroll', mouseWheelMove);
+    maximizedLayer.removeEventListener('mousewheel', mouseWheelMove);
+    maximizedLayer.removeEventListener('click', handleClickOnMaximizedLayer);
 }
