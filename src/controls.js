@@ -60,6 +60,10 @@ galry.prev = function() {
     }
 };
 
+galry.getCurrentItemId = function() {
+    return currentMaximizedItemId;
+};
+
 /**
  * Get the ID of the next item in line
  * 

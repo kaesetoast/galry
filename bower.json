@@ -1,19 +1,19 @@
 {
-    "name": "galry",
-    "version": "0.0.1",
-    "authors": [
-        "Philipp Nowinski <philipp@nowinski.de>"
-    ],
-    "description": "A simple HTML5 image gallery",
-    "main": "dist/galry.min.js",
-    "license": "MIT",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test"
-    ],
-    "devDependencies": {
-        "qunit": "~1.12.0"
-    }
+  "name": "galry",
+  "version": "0.0.1",
+  "authors": [
+    "Philipp Nowinski <philipp@nowinski.de>"
+  ],
+  "description": "A simple HTML5 image gallery",
+  "main": "dist/galry.min.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "devDependencies": {
+    "jasmine": "~2.0.0"
+  }
 }

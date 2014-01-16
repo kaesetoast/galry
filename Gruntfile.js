@@ -43,6 +43,12 @@ module.exports = function(grunt) {
             }
         },
 
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
+        },
+
         watch: {
             js: {
                 files: ['src/*.js', 'demo/*.html'],
@@ -60,6 +66,7 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib');
+    grunt.loadNpmTasks('grunt-karma');
 
     grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'watch']);
 
