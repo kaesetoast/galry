@@ -46,11 +46,20 @@ galry.setOptions = function(_options) {
     }
 };
 
+/**
+ * This function destroys the galry instance and cleans up the DOM
+ * 
+ */
 galry.destroy = function() {
     removeEventListeners();
     document.body.removeChild(maximizedLayer);
 };
 
+/**
+ * Returns the gallery root node
+ * 
+ * @return {DomNode}
+ */
 galry.getGalleryDomNode = function() {
     return galleryWrapper;
 };
@@ -126,6 +135,11 @@ function fetchGalleryElement(_galleryIdentifier) {
     }
 }
 
+/**
+ * Event Handler for any keydown event
+ * 
+ * @param  {[type]} _event The keydown event
+ */
 function handleKeyDownEvents(_event) {
     if (_event.keyCode == 27) {
         galry.minimize();
@@ -136,6 +150,11 @@ function handleKeyDownEvents(_event) {
     }
 }
 
+/**
+ * Event Handler for clicks on the maximized layer
+ * 
+ * @param  {[type]} _event The click event
+ */
 function handleClickOnMaximizedLayer(_event) {
     // check if that the click did not appear on the image
     // to prevent unwanted closing
@@ -156,6 +175,11 @@ function initEventListeners() {
     controlPrev.addEventListener('click', galry.prev);
 }
 
+/**
+ * This function removes all event listeners added by this library
+ * it serves as a part of the cleanup function
+ * 
+ */
 function removeEventListeners() {
     document.removeEventListener('keydown', handleKeyDownEvents);
     maximizedLayer.removeEventListener('DOMMouseScroll', mouseWheelMove);

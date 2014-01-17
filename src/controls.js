@@ -60,6 +60,11 @@ galry.prev = function() {
     }
 };
 
+/**
+ * Returns the ID of the currently maximized item
+ * 
+ * @return {Number} The id
+ */
 galry.getCurrentItemId = function() {
     return currentMaximizedItemId;
 };
