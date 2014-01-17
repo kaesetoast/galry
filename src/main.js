@@ -3,6 +3,8 @@ var galleryWrapper,
     maximizedGallery = document.createElement('ul'),
     maximizedGalleryItems = [],
     maximizedLayer = document.createElement('div'),
+    controlNext = document.createElement('a'),
+    controlPrev = document.createElement('a'),
     currentMaximizedItemId = 0,
     options = {
         styles: {
@@ -11,7 +13,9 @@ var galleryWrapper,
             maximizedLayerClassName: 'gal-maximized-layer',
             currentMaximizedImageClassName: 'gal-current-max',
             nextMaximizedImageClassName: 'gal-next-max',
-            prevMaximizedImageClassName: 'gal-prev-max'
+            prevMaximizedImageClassName: 'gal-prev-max',
+            controlNextClassName: 'gal-control-next',
+            controlPrevClassName: 'gal-control-prev'
         }
     };
 
@@ -66,7 +70,7 @@ function initGallery () {
         maximizedGalleryItems.push(item);
         item.appendChild(image);
         item.classList.add(options.styles.elementsClassName);
-        image.addEventListener('load', setImageMaxDimensions);
+        image.addEventListener('load', setImageDimensions);
         image.src = galleryItems[i].href;
     }
     // create fullscreen layer
@@ -74,6 +78,11 @@ function initGallery () {
     maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
     document.body.appendChild(maximizedLayer);
     maximizedLayer.appendChild(maximizedGallery);
+    // create control elements
+    controlNext.classList.add(options.styles.controlNextClassName);
+    controlPrev.classList.add(options.styles.controlPrevClassName);
+    maximizedLayer.appendChild(controlNext);
+    maximizedLayer.appendChild(controlPrev);
     // events
     initEventListeners();
 }
@@ -94,7 +103,7 @@ galry.addEventListener = function(eventName, callback) {
  * 
  * @param {event} _event the onLoad event
  */
-function setImageMaxDimensions(_event) {
+function setImageDimensions(_event) {
     var image = _event.target;
     image.style.maxHeight = image.naturalHeight + 'px';
     image.style.maxWidth = image.naturalWidth + 'px';
@@ -130,7 +139,7 @@ function handleKeyDownEvents(_event) {
 function handleClickOnMaximizedLayer(_event) {
     // check if that the click did not appear on the image
     // to prevent unwanted closing
-    if (_event.target.nodeName !== 'IMG') {
+    if (_event.target.nodeName !== 'IMG' && _event.target.nodeName !== 'A') {
         galry.minimize();
     }
 }
@@ -143,6 +152,8 @@ function initEventListeners() {
     maximizedLayer.addEventListener('DOMMouseScroll', mouseWheelMove);
     maximizedLayer.addEventListener('mousewheel', mouseWheelMove);
     maximizedLayer.addEventListener('click', handleClickOnMaximizedLayer);
+    controlNext.addEventListener('click', galry.next);
+    controlPrev.addEventListener('click', galry.prev);
 }
 
 function removeEventListeners() {

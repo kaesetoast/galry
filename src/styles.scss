@@ -1,54 +1,5 @@
 @import "compass/css3";
 
-body {
-    background-color: whitesmoke;
-    padding: 0;
-    margin: 0;
-}
-
-header {
-    background-color: #3e3e3e;
-    color: white;
-    height: 7em;
-    @include border-radius(5px);
-}
-
-h1 {
-    font-family: 'sans';
-    color: #3e3e3e;
-    margin: 0 auto;
-    width: 90%;
-    max-width: 1024px;
-    padding: 0.5em;
-    font-size: 3em;
-    font-weight: 400;
-}
-
-h2 {
-    font-family: 'sans';
-    font-weight: 400;
-    padding: 0.3em 0.5em;
-    font-size: 2em;
-    margin: 0;
-}
-
-p {
-    font-family: 'sans';
-    padding: 0 1em;
-    font-size: 1.2em;
-}
-
-main, header {
-    width: 90%;
-    max-width: 1024px;
-    margin: auto;
-}
-
-li {
-    display: inline-block;
-    margin: 0.5em;
-}
-
 .gal-item {
     img {
         @include box-shadow(0 0 8px #888);
@@ -71,22 +22,67 @@ li {
     &.hidden {
         display: none;
     }
+    .gal-control-next, .gal-control-prev {
+        width: 4em;
+        height: 4em;
+        display: block;
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.8);
+        border: 1px solid white;
+        @include border-radius(2em);
+        @include box-shadow(0 0 5px #000);
+        @include transition(opacity 0.4s ease);
+        top: 50%;
+        margin-top: -2em;
+        cursor: pointer;
+        opacity: 0.1;
+        &:hover {
+            opacity: 1;
+        }
+        &:after {
+            content: '>';
+            display: block;
+            color: white;
+            width: 2em;
+            height: 2em;
+            font-size: 2em;
+            line-height: 2em;
+            position: absolute;
+            top: 0;
+            left: 0;
+            text-align: center;
+        }
+    }
+    .gal-control-prev {
+        left: 2em;
+        @include transform(rotate(180deg));
+    }
+    .gal-control-next {
+        right: 2em;
+    }
     ul {
         padding: 0;
         .gal-item {
             display: none;
-            img {
-                margin: 2em auto;
-                display: block;
-                width: 90%;
-            }
             @include transition(all 0.5s ease);
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            img {
+                width: 90%;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+            }
             &.gal-current-max, &.gal-next-max, &.gal-prev-max {
                 display: block;
             }
             &.gal-next-max, &.gal-prev-max {
-                position: absolute;
-                top: 0;
                 opacity: 0;
             }
             &.gal-prev-max {
