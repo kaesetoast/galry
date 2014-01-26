@@ -138,12 +138,12 @@ function mouseWheelMove(_event) {
 }
 var galleryWrapper,
     galleryItems,
-    maximizedGallery = document.createElement('ul'),
-    maximizedGalleryItems = [],
-    maximizedLayer = document.createElement('div'),
-    controlNext = document.createElement('a'),
-    controlPrev = document.createElement('a'),
-    currentMaximizedItemId = 0,
+    maximizedGallery,
+    maximizedGalleryItems,
+    maximizedLayer,
+    controlNext,
+    controlPrev,
+    currentMaximizedItemId,
     options = {
         styles: {
             elementsClassName: 'gal-item',
@@ -192,6 +192,9 @@ galry.setOptions = function(_options) {
  * 
  */
 galry.destroy = function() {
+    if (typeof galry.thumbPanel !== 'undefined') {
+        galry.thumbPanel.destroy();
+    }
     removeEventListeners();
     document.body.removeChild(maximizedLayer);
 };
@@ -209,6 +212,12 @@ galry.getGalleryDomNode = function() {
  * Initialize the gallery
  */
 function initGallery () {
+    maximizedGallery = document.createElement('ul');
+    maximizedGalleryItems = [];
+    maximizedLayer = document.createElement('div');
+    controlNext = document.createElement('a');
+    controlPrev = document.createElement('a');
+    currentMaximizedItemId = 0;
     // fetch and set up gallery items
     galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
     for (var i = 0; i < galleryItems.length; i++) {
@@ -247,8 +256,12 @@ function initGallery () {
  * @param {string}   eventName the name of the event
  * @param {Function} callback
  */
-galry.addEventListener = function(eventName, callback) {
-    galleryWrapper.addEventListener(eventName, callback);
+galry.addEventListener = function(_eventName, _callback) {
+    galleryWrapper.addEventListener(_eventName, _callback);
+};
+
+galry.removeEventListener = function(_eventName, _callback) {
+    galleryWrapper.removeEventListener(_eventName, _callback);
 };
 
 /**
@@ -355,6 +368,11 @@ galry.thumbPanel = {};
         }
         // register eventlistener to set the current item
         galry.addEventListener('maximize', setCurrentItem);
+    };
+
+    galry.thumbPanel.destroy = function() {
+        maximizedLayer.removeChild(thumbPanel);
+        galry.removeEventListener('maximize', setCurrentItem);
     };
 
     /**

@@ -24,6 +24,11 @@ galry.thumbPanel = {};
         galry.addEventListener('maximize', setCurrentItem);
     };
 
+    galry.thumbPanel.destroy = function() {
+        maximizedLayer.removeChild(thumbPanel);
+        galry.removeEventListener('maximize', setCurrentItem);
+    };
+
     /**
      * Set the currently maximized item
      * this function gets called by the galry maximize event
