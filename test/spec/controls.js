@@ -12,8 +12,8 @@ describe('controls', function() {
     });
 
     it('should be able to move to next slide', function() {
-        var maximizedLayer = document.getElementsByClassName('gal-maximized-layer'),
-            slides = maximizedLayer[0].getElementsByClassName('gal-item');
+        var maximizedGallery = document.getElementsByClassName('gal-maximized-gallery'),
+            slides = maximizedGallery[0].getElementsByClassName('gal-item');
         gallery.maximize(0);
         gallery.next();
         expect(gallery.getCurrentItemId()).toEqual(1);
@@ -21,8 +21,8 @@ describe('controls', function() {
     });
 
     it('should be able to move to the previous slide', function() {
-        var maximizedLayer = document.getElementsByClassName('gal-maximized-layer'),
-            slides = maximizedLayer[0].getElementsByClassName('gal-item');
+        var maximizedGallery = document.getElementsByClassName('gal-maximized-gallery'),
+            slides = maximizedGallery[0].getElementsByClassName('gal-item');
         gallery.maximize(1);
         gallery.prev();
         expect(gallery.getCurrentItemId()).toEqual(0);
