@@ -1,5 +1,3 @@
-// TODO: make this a module
-
 /**
  * Maximize the given item
  * 

@@ -46,4 +46,9 @@ describe('controls', function() {
         expect(slides[0].classList.contains('gal-current-max')).toBe(true);
     });
 
+    it('should be able to return the current slide number', function(){
+        gallery.maximize(4);
+        expect(gallery.getCurrentItemId()).toBe(4);
+    });
+
 });

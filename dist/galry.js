@@ -6,8 +6,6 @@
 
 'use strict';
 
-// TODO: make this a module
-
 /**
  * Maximize the given item
  * 
@@ -192,7 +190,7 @@ galry.setOptions = function(_options) {
  * 
  */
 galry.destroy = function() {
-    if (typeof galry.thumbPanel !== 'undefined') {
+    if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
         galry.thumbPanel.destroy();
     }
     removeEventListeners();
