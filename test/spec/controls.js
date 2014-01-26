@@ -1,9 +1,13 @@
 describe('controls', function() {
-    var gallery;
+    var gallery,
+        maximizedGallery,
+        slides;
 
     beforeEach(function() {
         setUpMarkup();
         gallery = new galry('gallery');
+        maximizedGallery = document.getElementsByClassName('gal-maximized-gallery');
+        slides = maximizedGallery[0].getElementsByClassName('gal-item');
     });
 
     afterEach(function() {
@@ -11,9 +15,24 @@ describe('controls', function() {
         document.body.removeChild(document.getElementById('gallery'));
     });
 
+    it('should be able to maximize a gallery item', function() {
+        gallery.maximize(0);
+        expect(slides[0].classList.contains('gal-current-max'));
+        gallery.maximize(4);
+        expect(slides[4].classList.contains('gal-current-max'));
+    });
+
+    it('should be able to minimize a maximized gallery item', function() {
+        expect(maximizedGallery[0].getElementsByClassName('gal-current-max').length).toBe(0);
+        gallery.maximize(3);
+        var maximizedLayer = document.getElementsByClassName('gal-maximized-layer')[0];
+        expect(maximizedLayer.classList.contains('hidden')).toBe(false);
+        expect(slides[3].classList.contains('gal-current-max')).toBe(true);
+        gallery.minimize();
+        expect(maximizedLayer.classList.contains('hidden')).toBe(true);
+    });
+
     it('should be able to move to next slide', function() {
-        var maximizedGallery = document.getElementsByClassName('gal-maximized-gallery'),
-            slides = maximizedGallery[0].getElementsByClassName('gal-item');
         gallery.maximize(0);
         gallery.next();
         expect(gallery.getCurrentItemId()).toEqual(1);
@@ -21,8 +40,6 @@ describe('controls', function() {
     });
 
     it('should be able to move to the previous slide', function() {
-        var maximizedGallery = document.getElementsByClassName('gal-maximized-gallery'),
-            slides = maximizedGallery[0].getElementsByClassName('gal-item');
         gallery.maximize(1);
         gallery.prev();
         expect(gallery.getCurrentItemId()).toEqual(0);
