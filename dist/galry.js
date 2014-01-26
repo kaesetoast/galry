@@ -246,6 +246,8 @@ function initGallery () {
     if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
         galry.thumbPanel.init();
     }
+    var evnt = new CustomEvent('ready');
+    galleryWrapper.dispatchEvent(evnt);
 }
 
 /**
