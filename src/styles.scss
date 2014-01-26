@@ -60,7 +60,35 @@
     .gal-control-next {
         right: 2em;
     }
-    ul {
+    .gal-thumb-panel {
+        height: 60px;
+        padding: 4px 0;
+        width: 100%;
+        position: absolute;
+        margin: 0;
+        bottom: 0;
+        background-color: black;
+        li {
+            display: inline-block;
+            margin: 0 1px;
+            .gal-item {
+                display: block;
+                height: 100%;
+                img {
+                    height: 100%;
+                    width: auto;
+                    opacity: 0.2;
+                    @include box-shadow(none);
+                }
+                &:hover, &.gal-current-item {
+                    img {
+                        opacity: 0.9;
+                    }
+                }
+            }
+        }
+    }
+    ul.gal-maximized-gallery {
         padding: 0;
         .gal-item {
             display: none;

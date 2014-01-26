@@ -15,8 +15,11 @@ var galleryWrapper,
             nextMaximizedImageClassName: 'gal-next-max',
             prevMaximizedImageClassName: 'gal-prev-max',
             controlNextClassName: 'gal-control-next',
-            controlPrevClassName: 'gal-control-prev'
-        }
+            controlPrevClassName: 'gal-control-prev',
+            thumbPanelClassName: 'gal-thumb-panel',
+            maximizedGalleryClassName: 'gal-maximized-gallery'
+        },
+        showThumbPanel: true
     };
 
 /**
@@ -24,7 +27,7 @@ var galleryWrapper,
  * 
  * @param  {mixed}  _galleryIdentifier the DOM Node that contains the gallery or its id-string
  * @param  {object} _options           the configuration object
- * @return {Function}                    the api object
+ * @return {Function}                  the api object
  */
 function galry(_galleryIdentifier, _options) {
     galry.setOptions(_options);
@@ -76,6 +79,7 @@ function initGallery () {
         var item = document.createElement('li'),
             image = document.createElement('img');
         maximizedGallery.appendChild(item);
+        maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
         maximizedGalleryItems.push(item);
         item.appendChild(image);
         item.classList.add(options.styles.elementsClassName);
@@ -94,6 +98,9 @@ function initGallery () {
     maximizedLayer.appendChild(controlPrev);
     // events
     initEventListeners();
+    if (options.showThumbPanel) {
+        galry.thumbPanel.init();
+    }
 }
 
 /**

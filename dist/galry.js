@@ -6,6 +6,8 @@
 
 'use strict';
 
+// TODO: make this a module
+
 /**
  * Maximize the given item
  * 
@@ -144,8 +146,11 @@ var galleryWrapper,
             nextMaximizedImageClassName: 'gal-next-max',
             prevMaximizedImageClassName: 'gal-prev-max',
             controlNextClassName: 'gal-control-next',
-            controlPrevClassName: 'gal-control-prev'
-        }
+            controlPrevClassName: 'gal-control-prev',
+            thumbPanelClassName: 'gal-thumb-panel',
+            maximizedGalleryClassName: 'gal-maximized-gallery'
+        },
+        showThumbPanel: true
     };
 
 /**
@@ -153,7 +158,7 @@ var galleryWrapper,
  * 
  * @param  {mixed}  _galleryIdentifier the DOM Node that contains the gallery or its id-string
  * @param  {object} _options           the configuration object
- * @return {Function}                    the api object
+ * @return {Function}                  the api object
  */
 function galry(_galleryIdentifier, _options) {
     galry.setOptions(_options);
@@ -205,6 +210,7 @@ function initGallery () {
         var item = document.createElement('li'),
             image = document.createElement('img');
         maximizedGallery.appendChild(item);
+        maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
         maximizedGalleryItems.push(item);
         item.appendChild(image);
         item.classList.add(options.styles.elementsClassName);
@@ -223,6 +229,9 @@ function initGallery () {
     maximizedLayer.appendChild(controlPrev);
     // events
     initEventListeners();
+    if (options.showThumbPanel) {
+        galry.thumbPanel.init();
+    }
 }
 
 /**
@@ -315,6 +324,23 @@ function removeEventListeners() {
     maximizedLayer.removeEventListener('mousewheel', mouseWheelMove);
     maximizedLayer.removeEventListener('click', handleClickOnMaximizedLayer);
 }
+galry.thumbPanel = {};
+
+(function() {
+    var thumbPanel;
+    galry.thumbPanel.init = function() {
+        thumbPanel = galleryWrapper.cloneNode(true);
+        // unset the id
+        thumbPanel.id = '';
+        thumbPanel.classList.add(options.styles.thumbPanelClassName);
+        maximizedLayer.appendChild(thumbPanel);
+        var thumbGalItems = thumbPanel.getElementsByClassName(options.styles.elementsClassName);
+        for (var i = thumbGalItems.length - 1; i >= 0; i--) {
+            thumbGalItems[i].addEventListener('click', maximizeClick, false);
+        }
+    };
+})();
+
 
 return galry;
 }));
