@@ -9,18 +9,25 @@ galry.maximize = function (_item) {
     if (typeof _item === 'number') {
         _item = galleryItems[_item];
     }
+    var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
     // remove old classes
     maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
     maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.remove(options.styles.prevMaximizedImageClassName);
     maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.remove(options.styles.nextMaximizedImageClassName);
     // set the new current index
-    currentMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
+    currentMaximizedItemId = newMaximizedItemId;
     // set new classes
     maximizedGalleryItems[currentMaximizedItemId].classList.add(options.styles.currentMaximizedImageClassName);
     maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.add(options.styles.prevMaximizedImageClassName);
     maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.add(options.styles.nextMaximizedImageClassName);
     // show maximized layer
     maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
+    var evnt = new CustomEvent('maximize', {
+        detail: {
+            currentMaximizedItemId: currentMaximizedItemId
+        }
+    });
+    galleryWrapper.dispatchEvent(evnt);
 };
 
 /**

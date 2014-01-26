@@ -79,8 +79,9 @@
                     width: auto;
                     opacity: 0.2;
                     @include box-shadow(none);
+                    @include transition(opacity 0.5s ease);
                 }
-                &:hover, &.gal-current-item {
+                &:hover, &.gal-current-max {
                     img {
                         opacity: 0.9;
                     }
