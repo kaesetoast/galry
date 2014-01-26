@@ -236,7 +236,7 @@ function initGallery () {
     maximizedLayer.appendChild(controlPrev);
     // events
     initEventListeners();
-    if (options.showThumbPanel) {
+    if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
         galry.thumbPanel.init();
     }
 }

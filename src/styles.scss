@@ -1,11 +1,5 @@
 @import "compass/css3";
 
-.gal-item {
-    img {
-        @include box-shadow(0 0 8px #888);
-    }
-}
-
 #gallery {
     margin: auto;
     text-align: center;
@@ -61,12 +55,18 @@
         right: 2em;
     }
     .gal-thumb-panel {
+        &:hover {
+            bottom: 0;
+            opacity: 1;
+        }
+        opacity: 0.6;
+        @include transition(all 0.5s ease);
         height: 60px;
         padding: 4px 0;
         width: 100%;
         position: absolute;
         margin: 0;
-        bottom: 0;
+        bottom: -40px;
         background-color: black;
         li {
             display: inline-block;
