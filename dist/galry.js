@@ -115,11 +115,11 @@ function getPrevItemId(_currentItemId) {
 /**
  * Click handler for maximizing items
  * 
- * @return {[type]}   [description]
+ * @param {event}   The click event
  */
-function maximizeClick (e) {
-    e.preventDefault();
-    galry.maximize(e.currentTarget);
+function maximizeClick (_event) {
+    _event.preventDefault();
+    galry.maximize(_event.currentTarget);
 }
 
 /**
