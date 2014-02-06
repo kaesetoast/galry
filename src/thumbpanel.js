@@ -15,6 +15,7 @@ galry.thumbPanel = {};
     galry.thumbPanel.init = function() {
         thumbWrapper = document.createElement('div');
         thumbPanel = galleryWrapper.cloneNode(true);
+        thumbPanel.className = '';
         // unset the id
         thumbPanel.id = '';
         thumbWrapper.classList.add(options.styles.thumbPanelClassName);

@@ -1,14 +1,13 @@
 body {
-    background-color: whitesmoke;
     padding: 0;
     margin: 0;
 }
 
 header {
-    background-color: #3e3e3e;
+    background-color: #ccc;
     color: white;
-    height: 7em;
-    border-radius: 5px;
+    line-height: 15em;
+    height: 15em;
 }
 
 h1 {
@@ -17,17 +16,27 @@ h1 {
     margin: 0 auto;
     width: 90%;
     max-width: 1024px;
-    padding: 0.5em 0;
+    padding: 0;
     font-size: 3em;
     font-weight: 400;
+    text-align: center;
 }
 
 h2 {
     font-family: 'sans';
     font-weight: 400;
-    padding: 0.3em 0.5em;
+    padding: 1em 0.5em 0.2em 0.5em;
     font-size: 2em;
     margin: 0;
+}
+
+article {
+    max-width: 1024px;
+    margin: auto;
+}
+
+#second {
+    background-color: #ccc;
 }
 
 p {
@@ -37,8 +46,7 @@ p {
 }
 
 main, header {
-    width: 90%;
-    max-width: 1024px;
+    width: 100%;
     margin: auto;
 }
 
@@ -47,11 +55,13 @@ li {
     margin: 0.5em;
 }
 
-#gallery {
-    padding: 0;
+ul.gallery {
+    padding: 0 0 2em 0;
+    text-align: center;
+    margin: 0;
 }
 
-#gallery .gal-item img {
+ul.gallery .gal-item img {
     -webkit-box-shadow: 0 0 8px #888;
     box-shadow: 0 0 8px #888;
 }
