@@ -24,20 +24,13 @@ var galleryWrapper,
         closeButtonText: 'close',
         showThumbPanel: true,
         activteTouch: true
-    };
+    },
+    galry = this;
 
-/**
- * Constructor function
- * 
- * @param  {mixed}  _galleryIdentifier the DOM Node that contains the gallery or its id-string
- * @param  {object} _options           the configuration object
- * @return {Function}                  the api object
- */
-function galry(_galleryIdentifier, _options) {
+function init() {
     galry.setOptions(_options);
     galleryWrapper = fetchGalleryElement(_galleryIdentifier);
     initGallery();
-    return galry;
 }
 
 /**
@@ -115,6 +108,7 @@ function initGallery () {
         galry.thumbPanel.init();
     }
     if (options.activteTouch && typeof galry.touch !== 'undefined') {
+        console.log('touch');
         galry.touch.init();
     }
     var evnt = new CustomEvent('ready');

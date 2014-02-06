@@ -26,7 +26,7 @@ describe('thumbPanel', function() {
 
     it('should be initializable', function() {
         gallery = new galry('gallery', {showThumbPanel: false});
-        galry.thumbPanel.init();
+        gallery.thumbPanel.init();
         expect(document.getElementsByClassName('gal-thumb-panel').length).toBe(1);
     });
 

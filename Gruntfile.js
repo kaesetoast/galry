@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         jshint: {
-            all: ['src/**/*.js', 'test/**/*.js']
+            all: ['src/**/*.js', 'test/**/*.js', '!src/_foot.js', '!src/_head.js']
         },
 
         compass: {
@@ -19,18 +19,15 @@ module.exports = function(grunt) {
         },
 
         concat: {
-            options: {
-                banner: '(function(root, factory) {\n'
-                        + '    if (typeof define === \'function\' && define.amd) define(factory);\n'
-                        + '    else if (typeof exports === \'object\') module.exports = factory();\n'
-                        + '    else root.galry = factory();\n'
-                        + '}(this, function() {\n'
-                        + '\n\'use strict\';\n\n',
-                footer: '\n\nreturn galry;\n'
-                        +'}));'
-            },
             dist: {
-                src : ['src/*.js'],
+                src : [
+                    'src/_head.js',
+                    'src/main.js',
+                    'src/controls.js',
+                    'src/thumbpanel.js',
+                    'src/touch.js',
+                    'src/_foot.js'
+                ],
                 dest: 'dist/galry.js'
             }
         },
@@ -43,6 +40,10 @@ module.exports = function(grunt) {
             }
         },
 
+        jsbeautifier: {
+            files: ['dist/galry.js']
+        },
+
         karma: {
             unit: {
                 configFile: 'karma.conf.js'
@@ -52,7 +53,7 @@ module.exports = function(grunt) {
         watch: {
             js: {
                 files: ['src/*.js', 'demo/*.html'],
-                tasks: ['jshint', 'concat', 'uglify']
+                tasks: ['jshint', 'concat', 'jsbeautifier', 'uglify']
             },
             css: {
                 files: ['src/*scss'],
@@ -67,7 +68,8 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-jsbeautifier');
 
-    grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'watch']);
+    grunt.registerTask('default', ['jshint', 'concat', 'jsbeautifier', 'uglify', 'watch']);
 
 };
