@@ -71,4 +71,31 @@ describe('main - test the rest', function() {
 
     });
 
+    describe('check if you can have multiple instances of galry on the same site', function() {
+        // set up a second galry instance
+        var galleryElement = document.createElement('ul');
+        galleryElement.id = 'gallery-2';
+        for (var i = 9; i--;) {
+            var li = document.createElement('li'),
+                anchor = document.createElement('a'),
+                image = document.createElement('img');
+            anchor.href = 'http://lorempixel.com/1024/768/food/' + i;
+            anchor.classList.add('gal-item');
+            image.src = 'http://lorempixel.com/250/150/food/' +i;
+            li.appendChild(anchor);
+            anchor.appendChild(image);
+            galleryElement.appendChild(li);
+        }
+        document.body.appendChild(galleryElement);
+        var gallery2 = new galry('gallery-2');
+
+        it('should address different elements for each galry instance', function(){
+            expect(gallery.getGalleryDomNode()).not.toEqual(gallery2.getGalleryDomNode());
+        });
+
+        // cleanup
+        gallery2.destroy();
+        document.body.removeChild(galleryElement);
+    });
+
 });
