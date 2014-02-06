@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                 banner: '(function(root, factory) {\n'
                         + '    if (typeof define === \'function\' && define.amd) define(factory);\n'
                         + '    else if (typeof exports === \'object\') module.exports = factory();\n'
-                        + '    else root.galry = factory()\n'
+                        + '    else root.galry = factory();\n'
                         + '}(this, function() {\n'
                         + '\n\'use strict\';\n\n',
                 footer: '\n\nreturn galry;\n'
