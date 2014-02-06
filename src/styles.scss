@@ -58,6 +58,7 @@
         right: 2em;
     }
     .gal-thumb-panel {
+        overflow: hidden;
         display: none;
         @media only screen and (min-width: 768px) {
             display: block;
@@ -75,22 +76,28 @@
         margin: 0;
         bottom: -40px;
         background-color: black;
-        li {
-            display: inline-block;
-            margin: 0 1px;
-            .gal-item {
-                display: block;
-                height: 100%;
-                img {
+        ul {
+            @include transition(all 0.5s ease);
+            min-width: 200%;
+            margin: 0;
+            padding: 0;
+            li {
+                display: inline-block;
+                margin: 0 1px;
+                .gal-item {
+                    display: block;
                     height: 100%;
-                    width: auto;
-                    opacity: 0.2;
-                    @include box-shadow(none);
-                    @include transition(opacity 0.5s ease);
-                }
-                &:hover, &.gal-current-max {
                     img {
-                        opacity: 0.9;
+                        height: 100%;
+                        width: auto;
+                        opacity: 0.2;
+                        @include box-shadow(none);
+                        @include transition(opacity 0.5s ease);
+                    }
+                    &:hover, &.gal-current-max {
+                        img {
+                            opacity: 0.9;
+                        }
                     }
                 }
             }
