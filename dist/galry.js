@@ -124,7 +124,6 @@
                 galry.thumbPanel.init();
             }
             if (options.activteTouch && typeof galry.touch !== 'undefined') {
-                console.log('touch');
                 galry.touch.init();
             }
             var evnt = new CustomEvent('ready');
