@@ -76,12 +76,15 @@
             min-width: 200%;
             margin: 0;
             padding: 0;
+            height: 100%;
             li {
                 display: inline-block;
                 margin: 0 1px;
+                height: 100%;
                 .gal-item {
                     display: block;
                     height: 100%;
+                    outline-style: none;
                     img {
                         height: 100%;
                         width: auto;
@@ -134,8 +137,7 @@
             left: 0;
             img {
                 height: 90%;
-                width: 90%;
-                object-fit: contain;
+                border: 2px solid white;
                 margin: auto;
                 position: absolute;
                 top: 0;

@@ -18,6 +18,7 @@
             galleryItems,
             maximizedGallery,
             maximizedGalleryItems,
+            maximizedGalleryImages,
             maximizedLayer,
             controlNext,
             controlPrev,
@@ -89,6 +90,7 @@
         function initGallery() {
             maximizedGallery = document.createElement('ul');
             maximizedGalleryItems = [];
+            maximizedGalleryImages = [];
             maximizedLayer = document.createElement('div');
             controlNext = document.createElement('a');
             controlPrev = document.createElement('a');
@@ -103,6 +105,7 @@
                 maximizedGallery.appendChild(item);
                 maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
                 maximizedGalleryItems.push(item);
+                maximizedGalleryImages.push(image);
                 item.appendChild(image);
                 item.classList.add(options.styles.elementsClassName);
                 image.addEventListener('load', setImageDimensions);
@@ -246,6 +249,13 @@
             maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.add(options.styles.nextMaximizedImageClassName);
             // show maximized layer
             maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
+            var currentImage = maximizedGalleryImages[currentMaximizedItemId];
+            var maxWidth = window.innerWidth * 0.9;
+            if (currentImage.clientWidth > maxWidth) {
+                var ratio = currentImage.width / currentImage.height;
+                currentImage.style.width = maxWidth + 'px';
+                currentImage.style.height = maxWidth / ratio + 'px';
+            }
             var evnt = new CustomEvent('maximize', {
                 detail: {
                     currentMaximizedItemId: currentMaximizedItemId
@@ -384,8 +394,12 @@
             };
 
             galry.thumbPanel.destroy = function() {
-                maximizedLayer.removeChild(thumbPanel);
+                maximizedLayer.removeChild(thumbWrapper);
                 galry.removeEventListener('maximize', setCurrentItem);
+            };
+
+            galry.thumbPanel.getThumbPanelDomNode = function() {
+                return thumbWrapper;
             };
 
             /**
@@ -400,7 +414,6 @@
                     maximizedItems[i].classList.remove(options.styles.currentMaximizedImageClassName);
                 }
                 currentThumbItem.classList.add(options.styles.currentMaximizedImageClassName);
-                console.log(currentThumbItem.offsetLeft, delta);
                 if (currentThumbItem.offsetLeft + currentThumbItem.clientWidth > window.innerWidth) {
                     delta = window.innerWidth - currentThumbItem.offsetLeft - currentThumbItem.clientWidth;
                     setTransform(delta);

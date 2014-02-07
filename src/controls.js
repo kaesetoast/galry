@@ -20,6 +20,13 @@ galry.maximize = function (_item) {
     maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.add(options.styles.nextMaximizedImageClassName);
     // show maximized layer
     maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
+    var currentImage = maximizedGalleryImages[currentMaximizedItemId];
+    var maxWidth = window.innerWidth * 0.9;
+    if (currentImage.clientWidth > maxWidth) {
+        var ratio = currentImage.width / currentImage.height;
+        currentImage.style.width = maxWidth + 'px';
+        currentImage.style.height = maxWidth / ratio + 'px';
+    }
     var evnt = new CustomEvent('maximize', {
         detail: {
             currentMaximizedItemId: currentMaximizedItemId

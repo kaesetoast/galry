@@ -30,8 +30,12 @@ galry.thumbPanel = {};
     };
 
     galry.thumbPanel.destroy = function() {
-        maximizedLayer.removeChild(thumbPanel);
+        maximizedLayer.removeChild(thumbWrapper);
         galry.removeEventListener('maximize', setCurrentItem);
+    };
+
+    galry.thumbPanel.getThumbPanelDomNode = function() {
+        return thumbWrapper;
     };
 
     /**
@@ -46,7 +50,6 @@ galry.thumbPanel = {};
             maximizedItems[i].classList.remove(options.styles.currentMaximizedImageClassName);
         }
         currentThumbItem.classList.add(options.styles.currentMaximizedImageClassName);
-        console.log(currentThumbItem.offsetLeft, delta);
         if (currentThumbItem.offsetLeft + currentThumbItem.clientWidth > window.innerWidth) {
             delta = window.innerWidth - currentThumbItem.offsetLeft - currentThumbItem.clientWidth;
             setTransform(delta);

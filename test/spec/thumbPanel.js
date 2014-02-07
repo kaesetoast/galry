@@ -47,4 +47,15 @@ describe('thumbPanel', function() {
         });
     });
 
+    it('should resize the images to the thumbPanel height', function() {
+        gallery = new galry('gallery');
+        gallery.maximize(0);
+        var thumbPanel = gallery.thumbPanel.getThumbPanelDomNode(),
+            referenceImage = thumbPanel.getElementsByClassName('gal-current-max')[0].getElementsByTagName('img')[0];
+        // ugly, but we have to wait for dom manipulation to take place
+        window.setTimeout(function(){
+            expect(thumbPanel.clientHeight).toEqual(referenceImage.clientHeight);
+        }, 100);
+    });
+
 });

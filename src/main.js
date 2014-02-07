@@ -2,6 +2,7 @@ var galleryWrapper,
     galleryItems,
     maximizedGallery,
     maximizedGalleryItems,
+    maximizedGalleryImages,
     maximizedLayer,
     controlNext,
     controlPrev,
@@ -73,6 +74,7 @@ galry.getGalleryDomNode = function() {
 function initGallery () {
     maximizedGallery = document.createElement('ul');
     maximizedGalleryItems = [];
+    maximizedGalleryImages = [];
     maximizedLayer = document.createElement('div');
     controlNext = document.createElement('a');
     controlPrev = document.createElement('a');
@@ -87,6 +89,7 @@ function initGallery () {
         maximizedGallery.appendChild(item);
         maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
         maximizedGalleryItems.push(item);
+        maximizedGalleryImages.push(image);
         item.appendChild(image);
         item.classList.add(options.styles.elementsClassName);
         image.addEventListener('load', setImageDimensions);
