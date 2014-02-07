@@ -12,6 +12,14 @@ Include dist/galry.min.js and dist/styles.css in your HTML document. You should 
         ...
     </ul>
 ```
+If you want to display a meta text for an image, just provide it in a data-attribute:
+
+```HTML
+    // Image with meta text
+    <li><a class="gal-item" data-meta="This is a beautiful image" href="path/to/large/image"><img src="path/to/thumbnail" alt=""></a></li>
+    // Image without meta text in the same gallery
+    <li><a class="gal-item" href="path/to/large/image"><img src="path/to/thumbnail" alt=""></a></li>
+```
 
 Now you just need to call
 
