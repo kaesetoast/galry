@@ -26,6 +26,7 @@ module.exports = function(grunt) {
                     'src/controls.js',
                     'src/thumbpanel.js',
                     'src/touch.js',
+                    'src/meta.js',
                     'src/_foot.js'
                 ],
                 dest: 'dist/galry.js'

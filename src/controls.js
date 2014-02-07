@@ -7,7 +7,8 @@ galry.maximize = function (_item) {
     if (typeof _item === 'number') {
         _item = galleryItems[_item];
     }
-    var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
+    var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10),
+        oldMaximizedItemId = currentMaximizedItemId;
     // remove old classes
     maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
     maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.remove(options.styles.prevMaximizedImageClassName);
@@ -29,7 +30,8 @@ galry.maximize = function (_item) {
     }
     var evnt = new CustomEvent('maximize', {
         detail: {
-            currentMaximizedItemId: currentMaximizedItemId
+            currentMaximizedItemId: currentMaximizedItemId,
+            lastMaximizdItemId:     oldMaximizedItemId
         }
     });
     galleryWrapper.dispatchEvent(evnt);

@@ -36,11 +36,13 @@
                     thumbPanelClassName: 'gal-thumb-panel',
                     maximizedGalleryClassName: 'gal-maximized-gallery',
                     closeButtonClassName: 'gal-close-button',
-                    topBarClassName: 'gal-top-bar'
+                    topBarClassName: 'gal-top-bar',
+                    metaBoxClassName: 'gal-meta-box'
                 },
                 closeButtonText: 'close',
                 showThumbPanel: true,
-                activteTouch: true
+                activteTouch: true,
+                showMeta: true
             },
             galry = this;
 
@@ -128,6 +130,9 @@
             }
             if (options.activteTouch && typeof galry.touch !== 'undefined') {
                 galry.touch.init();
+            }
+            if (options.showMeta && typeof galry.meta !== 'undefined') {
+                galry.meta.init();
             }
             var evnt = new CustomEvent('ready');
             galleryWrapper.dispatchEvent(evnt);
@@ -236,7 +241,8 @@
             if (typeof _item === 'number') {
                 _item = galleryItems[_item];
             }
-            var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10);
+            var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10),
+                oldMaximizedItemId = currentMaximizedItemId;
             // remove old classes
             maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
             maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.remove(options.styles.prevMaximizedImageClassName);
@@ -258,7 +264,8 @@
             }
             var evnt = new CustomEvent('maximize', {
                 detail: {
-                    currentMaximizedItemId: currentMaximizedItemId
+                    currentMaximizedItemId: currentMaximizedItemId,
+                    lastMaximizdItemId: oldMaximizedItemId
                 }
             });
             galleryWrapper.dispatchEvent(evnt);
@@ -489,6 +496,48 @@
 
         })();
 
+        /**
+         * This module adds the ability to display meta text on images
+         */
+        galry.meta = {};
+
+        (function() {
+
+            var metaBoxWrapper,
+                metaBox,
+                metaText,
+                isInjected = false;
+
+            /**
+             * initialize the meta module
+             */
+            galry.meta.init = function() {
+                metaBoxWrapper = document.createElement('div');
+                metaBox = document.createElement('div');
+                metaText = document.createElement('p');
+                metaBoxWrapper.appendChild(metaBox);
+                metaBox.appendChild(metaText);
+                metaBoxWrapper.classList.add(options.styles.metaBoxClassName);
+                galry.addEventListener('maximize', setCurrentMetaText);
+            };
+
+            function setCurrentMetaText(_event) {
+                var lastIndex = _event.detail.lastMaximizedItemId,
+                    currentIndex = _event.detail.currentMaximizedItemId;
+                if (isInjected) {
+                    maximizedGalleryItems[lastIndex].removeChild(metaBoxWrapper);
+                }
+                if (galleryItems[currentIndex].hasAttribute('data-meta')) {
+                    metaText.innerText = galleryItems[currentIndex].getAttribute('data-meta');
+                    metaBoxWrapper.style.width = maximizedGalleryImages[currentIndex].clientWidth + 'px';
+                    metaBoxWrapper.style.height = maximizedGalleryImages[currentIndex].clientHeight + 'px';
+                    metaBoxWrapper.style.marginLeft = -maximizedGalleryImages[currentIndex].clientWidth / 2 + 'px';
+                    metaBoxWrapper.style.marginTop = -maximizedGalleryImages[currentIndex].clientHeight / 2 + 'px';
+                    maximizedGalleryItems[currentIndex].appendChild(metaBoxWrapper);
+                }
+            }
+
+        })();
         init(this);
     }
     return galry;

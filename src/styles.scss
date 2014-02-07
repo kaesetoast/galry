@@ -145,6 +145,22 @@
                 bottom: 0;
                 right: 0;
             }
+            .gal-meta-box {
+                background-color: transparent;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin: 0;
+                div {
+                    background-color: rgba(0, 0, 0, 0.7);
+                    position: absolute;
+                    bottom: 0;
+                    width: 100%;
+                    p {
+                        color: white;
+                    }
+                }
+            }
             &.gal-current-max, &.gal-next-max, &.gal-prev-max {
                 display: block;
             }

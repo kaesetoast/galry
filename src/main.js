@@ -20,11 +20,13 @@ var galleryWrapper,
             thumbPanelClassName: 'gal-thumb-panel',
             maximizedGalleryClassName: 'gal-maximized-gallery',
             closeButtonClassName: 'gal-close-button',
-            topBarClassName: 'gal-top-bar'
+            topBarClassName: 'gal-top-bar',
+            metaBoxClassName: 'gal-meta-box'
         },
         closeButtonText: 'close',
         showThumbPanel: true,
-        activteTouch: true
+        activteTouch: true,
+        showMeta: true
     },
     galry = this;
 
@@ -112,6 +114,9 @@ function initGallery () {
     }
     if (options.activteTouch && typeof galry.touch !== 'undefined') {
         galry.touch.init();
+    }
+    if (options.showMeta && typeof galry.meta !== 'undefined') {
+        galry.meta.init();
     }
     var evnt = new CustomEvent('ready');
     galleryWrapper.dispatchEvent(evnt);
