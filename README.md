@@ -36,7 +36,6 @@ make galry work propperly. To keep the core clean, galry does not ship with thee
 dropping in the following ones:
 
  * [classList](https://github.com/eligrey/classList.js) | IE < 10, iOS Safari < 5, Android Stock Browser < 3 | Check current status at [caniuse](http://caniuse.com/#search=classlist)
- * [object-fit](https://github.com/anselmh/object-fit) | needed for current FF (vote for [this bug](https://bugzilla.mozilla.org/show_bug.cgi?id=624647)), IE < 8 (who wants to support that?) | Check current status at [caniuse](http://caniuse.com/#search=object-fit)
 
 ## API
 
