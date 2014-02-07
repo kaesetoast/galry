@@ -23,6 +23,7 @@ and you are good to go :-)
 
 ![Screenshot](https://github.com/kaesetoast/galry/raw/master/screenshot-1.png)
 ![Screenshot](https://github.com/kaesetoast/galry/raw/master/screenshot-2.png)
+![Screenshot](https://github.com/kaesetoast/galry/raw/master/screenshot-3.png)
 
 ## Installation
 
