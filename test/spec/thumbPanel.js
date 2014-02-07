@@ -10,20 +10,6 @@ describe('thumbPanel', function() {
         document.body.removeChild(document.getElementById('gallery'));
     });
 
-    it('should not be initialized when deactivated', function() {
-        gallery = new galry('gallery', {showThumbPanel: false});
-        gallery.addEventListener('ready', function(){
-            expect(document.getElementsByClassName('gal-thumb-panel').length).toBe(0);
-        });
-    });
-
-    it('should be initialized by default', function() {
-        gallery = new galry('gallery');
-        gallery.addEventListener('ready', function(){
-            expect(document.getElementsByClassName('gal-thumb-panel').length).toBe(1);
-        });
-    });
-
     it('should be initializable', function() {
         gallery = new galry('gallery', {showThumbPanel: false});
         gallery.thumbPanel.init();
