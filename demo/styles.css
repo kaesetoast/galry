@@ -35,7 +35,7 @@ article {
     margin: auto;
 }
 
-#second {
+section:nth-child(even) {
     background-color: #ccc;
 }
 
