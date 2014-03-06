@@ -1,79 +1,42 @@
 /**
- * Maximize the given item
- * 
- * @param  {mixed} _item the item itself, or its id
- */
-galry.maximize = function (_item) {
-    if (typeof _item === 'number') {
-        _item = galleryItems[_item];
-    }
-    var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10),
-        oldMaximizedItemId = currentMaximizedItemId;
-    // remove old classes
-    maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
-    maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.remove(options.styles.prevMaximizedImageClassName);
-    maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.remove(options.styles.nextMaximizedImageClassName);
-    // set the new current index
-    currentMaximizedItemId = newMaximizedItemId;
-    // set new classes
-    maximizedGalleryItems[currentMaximizedItemId].classList.add(options.styles.currentMaximizedImageClassName);
-    maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.add(options.styles.prevMaximizedImageClassName);
-    maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.add(options.styles.nextMaximizedImageClassName);
-    // show maximized layer
-    maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
-    var currentImage = maximizedGalleryImages[currentMaximizedItemId];
-    var maxWidth = window.innerWidth * 0.9;
-    if (currentImage.clientWidth > maxWidth) {
-        var ratio = currentImage.width / currentImage.height;
-        currentImage.style.width = maxWidth + 'px';
-        currentImage.style.height = maxWidth / ratio + 'px';
-    }
-    var evnt = new CustomEvent('maximize', {
-        detail: {
-            currentMaximizedItemId: currentMaximizedItemId,
-            lastMaximizdItemId:     oldMaximizedItemId
-        }
-    });
-    galleryWrapper.dispatchEvent(evnt);
-};
-
-/**
- * Minimize the gallery
- */
-galry.minimize = function () {
-    maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
-};
-
-/**
- * Maximize the next item in line
+ * Go to the next item in line
  */
 galry.next = function() {
-    if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
-        var nextItem = getNextItemId(currentMaximizedItemId);
-        galry.maximize(galleryItems[nextItem]);
-        var evnt = new CustomEvent('nextItem', {
-            detail: {
-                currentMaximizedItemId: nextItem
-            }
-        });
-        galleryWrapper.dispatchEvent(evnt);
-    }
+    var nextItemId = getNextItemId(currentItemId);
+    galry.goTo(galleryItems[nextItemId]);
+    fireGalryEvent('nextItem', {currentItemId: nextItemId});
 };
 
 /**
- * Maximize the previous item in line
+ * Go to the previous item in line
  */
 galry.prev = function() {
-    if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
-        var nextItem = getPrevItemId(currentMaximizedItemId);
-        galry.maximize(galleryItems[nextItem]);
-        var evnt = new CustomEvent('prevItem', {
-            detail: {
-                currentMaximizedItemId: nextItem
-            }
-        });
-        galleryWrapper.dispatchEvent(evnt);
+    var nextItemId = getPrevItemId(currentItemId);
+    galry.goTo(galleryItems[nextItemId]);
+    fireGalryEvent('prevItem', {currentItemId: nextItemId});
+};
+
+/**
+ * Go to _item
+ * @param  {mixed} _item Item id or the DOMNode itself
+ */
+galry.goTo = function(_item) {
+    var newItemId,
+        oldItemId = currentItemId;
+    if (typeof _item === 'number') {
+        newItemId = _item;
+        _item = galleryItems[_item];
+    } else {
+        newItemId = parseInt(_item.getAttribute('data-id'), 10);
     }
+    if (galleryItems.length > newItemId) {
+        currentItemId = newItemId;
+        setItemClassNames();
+    }
+    fireGalryEvent('changeItem', {
+        currentItemId: currentItemId,
+        oldItemId: oldItemId
+    });
 };
 
 /**
@@ -82,7 +45,7 @@ galry.prev = function() {
  * @return {Number} The id
  */
 galry.getCurrentItemId = function() {
-    return currentMaximizedItemId;
+    return currentItemId;
 };
 
 /**
@@ -111,16 +74,6 @@ function getPrevItemId(_currentItemId) {
     } else {
         return _currentItemId - 1;
     }
-}
-
-/**
- * Click handler for maximizing items
- * 
- * @param {event}   The click event
- */
-function maximizeClick (_event) {
-    _event.preventDefault();
-    galry.maximize(_event.currentTarget);
 }
 
 /**

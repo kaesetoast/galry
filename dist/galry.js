@@ -16,21 +16,18 @@
 
         var galleryWrapper,
             galleryItems,
-            maximizedGallery,
-            maximizedGalleryItems,
-            maximizedGalleryImages,
-            maximizedLayer,
+            currentItemId,
             controlNext,
             controlPrev,
-            currentMaximizedItemId,
+            // TODO: each module should manage its own options
             options = {
                 styles: {
                     elementsClassName: 'gal-item',
                     maximizedLayerHiddenClassName: 'hidden',
                     maximizedLayerClassName: 'gal-maximized-layer',
-                    currentMaximizedImageClassName: 'gal-current-max',
-                    nextMaximizedImageClassName: 'gal-next-max',
-                    prevMaximizedImageClassName: 'gal-prev-max',
+                    currentItemClassName: 'gal-current-item',
+                    nextItemClassName: 'gal-next-item',
+                    prevItemClassName: 'gal-prev-item',
                     controlNextClassName: 'gal-control-next',
                     controlPrevClassName: 'gal-control-prev',
                     thumbPanelClassName: 'gal-thumb-panel',
@@ -42,10 +39,18 @@
                 closeButtonText: 'close',
                 showThumbPanel: true,
                 activteTouch: true,
-                showMeta: true
+                showMeta: true,
+                lightbox: true
             },
+            hooks = {},
             galry = this;
 
+        galry.GALLERY_ITEM_CREATION_HOOK = 'gallery-item-creation-hook';
+        galry.GALLERY_READY_HOOK = 'gallery-ready-hook';
+
+        /**
+         * Bootstrap function
+         */
         function init() {
             galry.setOptions(_options);
             galleryWrapper = fetchGalleryElement(_galleryIdentifier);
@@ -70,11 +75,14 @@
          *
          */
         galry.destroy = function() {
+            if (options.lightbox && typeof galry.lightbox !== 'undefined') {
+                galry.lightbox.destroy();
+            }
             if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
                 galry.thumbPanel.destroy();
             }
+            removeItemClassNames();
             removeEventListeners();
-            document.body.removeChild(maximizedLayer);
         };
 
         /**
@@ -90,41 +98,24 @@
          * Initialize the gallery
          */
         function initGallery() {
-            maximizedGallery = document.createElement('ul');
-            maximizedGalleryItems = [];
-            maximizedGalleryImages = [];
-            maximizedLayer = document.createElement('div');
-            controlNext = document.createElement('a');
-            controlPrev = document.createElement('a');
-            currentMaximizedItemId = 0;
-            // fetch and set up gallery items
-            galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
-            for (var i = 0; i < galleryItems.length; i++) {
-                galleryItems[i].addEventListener('click', maximizeClick, false);
-                galleryItems[i].setAttribute('data-id', i);
-                var item = document.createElement('li'),
-                    image = document.createElement('img');
-                maximizedGallery.appendChild(item);
-                maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
-                maximizedGalleryItems.push(item);
-                maximizedGalleryImages.push(image);
-                item.appendChild(image);
-                item.classList.add(options.styles.elementsClassName);
-                image.addEventListener('load', setImageDimensions);
-                image.src = galleryItems[i].href;
-            }
-            // create fullscreen layer
-            maximizedLayer.classList.add(options.styles.maximizedLayerClassName);
-            maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
-            document.body.appendChild(maximizedLayer);
-            maximizedLayer.appendChild(maximizedGallery);
-            // create control elements
-            controlNext.classList.add(options.styles.controlNextClassName);
-            controlPrev.classList.add(options.styles.controlPrevClassName);
-            maximizedLayer.appendChild(controlNext);
-            maximizedLayer.appendChild(controlPrev);
+            currentItemId = 0;
+            initModules();
+            fetchGalleryItems();
             // events
             initEventListeners();
+            callHooks(galry.GALLERY_READY_HOOK);
+            var evnt = new CustomEvent('ready');
+            galleryWrapper.dispatchEvent(evnt);
+        }
+
+        /**
+         * Init all modules
+         */
+        function initModules() {
+            // TODO: this should be done in a more generic way.. ModuleManager?
+            if (options.lightbox && galry.lightbox !== 'undefined') {
+                galry.lightbox.init();
+            }
             if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
                 galry.thumbPanel.init();
             }
@@ -134,34 +125,85 @@
             if (options.showMeta && typeof galry.meta !== 'undefined') {
                 galry.meta.init();
             }
-            var evnt = new CustomEvent('ready');
-            galleryWrapper.dispatchEvent(evnt);
+        }
+
+        /**
+         * Fetch and setup all gallery items
+         */
+        function fetchGalleryItems() {
+            galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
+            for (var i = 0; i < galleryItems.length; i++) {
+                galleryItems[i].setAttribute('data-id', i);
+                callHooks(galry.GALLERY_ITEM_CREATION_HOOK, galleryItems[i]);
+            }
+            setItemClassNames();
         }
 
         /**
          * Add a listener for the galry events
          *
-         * @param {string}   eventName the name of the event
-         * @param {Function} callback
+         * @param {string}   _eventName the name of the event
+         * @param {Function} _callback
          */
         galry.addEventListener = function(_eventName, _callback) {
             galleryWrapper.addEventListener(_eventName, _callback);
         };
 
+        /**
+         * Remove a listener for galry events
+         * @param  {String} _eventName the name of the event
+         * @param  {[type]} _callback
+         */
         galry.removeEventListener = function(_eventName, _callback) {
             galleryWrapper.removeEventListener(_eventName, _callback);
         };
 
         /**
-         * Set max-width and max-height to the exact dimensions of the image
-         * This function should be called through an onLoad listener on the image
-         *
-         * @param {event} _event the onLoad event
+         * This function registers a hook for _hookName
+         * @param {String}   _hookName Name of the hook
+         * @param {Function} _callback The hook callback
          */
-        function setImageDimensions(_event) {
-            var image = _event.target;
-            image.style.maxHeight = image.naturalHeight + 'px';
-            image.style.maxWidth = image.naturalWidth + 'px';
+        galry.addHook = function(_hookName, _callback) {
+            if (typeof hooks[_hookName] === 'undefined') {
+                hooks[_hookName] = [];
+            }
+            hooks[_hookName].push(_callback);
+        };
+
+        /**
+         * This function calls all hooks registered on _hookName
+         * @param  {String} _hookName Name of the hook
+         * @param  {mixed}  _hookData Any kind of data that shall be passed to the hook function
+         */
+        function callHooks(_hookName, _hookData) {
+            var storedHooks = hooks[_hookName];
+            if (typeof storedHooks !== 'undefined') {
+                for (var i = storedHooks.length; i--;) {
+                    storedHooks[i].call(storedHooks[i], _hookData);
+                }
+            }
+        }
+
+        /**
+         * This function sets classNames to indicate current, next and prev items
+         */
+        function setItemClassNames() {
+            // remove currently set classnames
+            removeItemClassNames();
+            galleryItems[currentItemId].classList.add(options.styles.currentItemClassName);
+            galleryItems[getNextItemId(currentItemId)].classList.add(options.styles.nextItemClassName);
+            galleryItems[getPrevItemId(currentItemId)].classList.add(options.styles.prevItemClassName);
+        }
+
+        /**
+         * This function removes all classNames on galleryItems set by galry.
+         */
+        function removeItemClassNames() {
+            for (var i = galleryItems.length - 1; i >= 0; i--) {
+                galleryItems[i].classList.remove(options.styles.currentItemClassName);
+                galleryItems[i].classList.remove(options.styles.nextItemClassName);
+                galleryItems[i].classList.remove(options.styles.prevItemClassName);
+            }
         }
 
         /**
@@ -184,28 +226,13 @@
         /**
          * Event Handler for any keydown event
          *
-         * @param  {[type]} _event The keydown event
+         * @param  {event} _event The keydown event
          */
         function handleKeyDownEvents(_event) {
-            if (_event.keyCode == 27) {
-                galry.minimize();
-            } else if (_event.keyCode == 38 || _event.keyCode == 39) {
+            if (_event.keyCode == 38 || _event.keyCode == 39) {
                 galry.next();
             } else if (_event.keyCode == 37 || _event.keyCode == 40) {
                 galry.prev();
-            }
-        }
-
-        /**
-         * Event Handler for clicks on the maximized layer
-         *
-         * @param  {[type]} _event The click event
-         */
-        function handleClickOnMaximizedLayer(_event) {
-            // check if that the click did not appear on the image
-            // to prevent unwanted closing
-            if (_event.target.nodeName !== 'IMG' && _event.target.nodeName !== 'A') {
-                galry.minimize();
             }
         }
 
@@ -214,11 +241,6 @@
          */
         function initEventListeners() {
             document.addEventListener('keydown', handleKeyDownEvents);
-            maximizedLayer.addEventListener('DOMMouseScroll', mouseWheelMove);
-            maximizedLayer.addEventListener('mousewheel', mouseWheelMove);
-            maximizedLayer.addEventListener('click', handleClickOnMaximizedLayer);
-            controlNext.addEventListener('click', galry.next);
-            controlPrev.addEventListener('click', galry.prev);
         }
 
         /**
@@ -228,86 +250,62 @@
          */
         function removeEventListeners() {
             document.removeEventListener('keydown', handleKeyDownEvents);
-            maximizedLayer.removeEventListener('DOMMouseScroll', mouseWheelMove);
-            maximizedLayer.removeEventListener('mousewheel', mouseWheelMove);
-            maximizedLayer.removeEventListener('click', handleClickOnMaximizedLayer);
         }
+
         /**
-         * Maximize the given item
-         *
-         * @param  {mixed} _item the item itself, or its id
+         * This function fires a custom event on galleryWrapper
+         * @param  {String} _eventName Name of the event
+         * @param  {[type]} _detail    Detail Object passed to the eventlistener
          */
-        galry.maximize = function(_item) {
-            if (typeof _item === 'number') {
-                _item = galleryItems[_item];
-            }
-            var newMaximizedItemId = parseInt(_item.getAttribute('data-id'), 10),
-                oldMaximizedItemId = currentMaximizedItemId;
-            // remove old classes
-            maximizedGalleryItems[currentMaximizedItemId].classList.remove(options.styles.currentMaximizedImageClassName);
-            maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.remove(options.styles.prevMaximizedImageClassName);
-            maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.remove(options.styles.nextMaximizedImageClassName);
-            // set the new current index
-            currentMaximizedItemId = newMaximizedItemId;
-            // set new classes
-            maximizedGalleryItems[currentMaximizedItemId].classList.add(options.styles.currentMaximizedImageClassName);
-            maximizedGalleryItems[getPrevItemId(currentMaximizedItemId)].classList.add(options.styles.prevMaximizedImageClassName);
-            maximizedGalleryItems[getNextItemId(currentMaximizedItemId)].classList.add(options.styles.nextMaximizedImageClassName);
-            // show maximized layer
-            maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
-            var currentImage = maximizedGalleryImages[currentMaximizedItemId];
-            var maxWidth = window.innerWidth * 0.9;
-            if (currentImage.clientWidth > maxWidth) {
-                var ratio = currentImage.width / currentImage.height;
-                currentImage.style.width = maxWidth + 'px';
-                currentImage.style.height = maxWidth / ratio + 'px';
-            }
-            var evnt = new CustomEvent('maximize', {
-                detail: {
-                    currentMaximizedItemId: currentMaximizedItemId,
-                    lastMaximizdItemId: oldMaximizedItemId
-                }
+        function fireGalryEvent(_eventName, _detail) {
+            var evnt = new CustomEvent(_eventName, {
+                detail: _detail
             });
             galleryWrapper.dispatchEvent(evnt);
-        };
-
+        }
         /**
-         * Minimize the gallery
-         */
-        galry.minimize = function() {
-            maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
-        };
-
-        /**
-         * Maximize the next item in line
+         * Go to the next item in line
          */
         galry.next = function() {
-            if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
-                var nextItem = getNextItemId(currentMaximizedItemId);
-                galry.maximize(galleryItems[nextItem]);
-                var evnt = new CustomEvent('nextItem', {
-                    detail: {
-                        currentMaximizedItemId: nextItem
-                    }
-                });
-                galleryWrapper.dispatchEvent(evnt);
-            }
+            var nextItemId = getNextItemId(currentItemId);
+            galry.goTo(galleryItems[nextItemId]);
+            fireGalryEvent('nextItem', {
+                currentItemId: nextItemId
+            });
         };
 
         /**
-         * Maximize the previous item in line
+         * Go to the previous item in line
          */
         galry.prev = function() {
-            if (!maximizedLayer.classList.contains(options.styles.maximizedLayerHiddenClassName)) {
-                var nextItem = getPrevItemId(currentMaximizedItemId);
-                galry.maximize(galleryItems[nextItem]);
-                var evnt = new CustomEvent('prevItem', {
-                    detail: {
-                        currentMaximizedItemId: nextItem
-                    }
-                });
-                galleryWrapper.dispatchEvent(evnt);
+            var nextItemId = getPrevItemId(currentItemId);
+            galry.goTo(galleryItems[nextItemId]);
+            fireGalryEvent('prevItem', {
+                currentItemId: nextItemId
+            });
+        };
+
+        /**
+         * Go to _item
+         * @param  {mixed} _item Item id or the DOMNode itself
+         */
+        galry.goTo = function(_item) {
+            var newItemId,
+                oldItemId = currentItemId;
+            if (typeof _item === 'number') {
+                newItemId = _item;
+                _item = galleryItems[_item];
+            } else {
+                newItemId = parseInt(_item.getAttribute('data-id'), 10);
             }
+            if (galleryItems.length > newItemId) {
+                currentItemId = newItemId;
+                setItemClassNames();
+            }
+            fireGalryEvent('changeItem', {
+                currentItemId: currentItemId,
+                oldItemId: oldItemId
+            });
         };
 
         /**
@@ -316,7 +314,7 @@
          * @return {Number} The id
          */
         galry.getCurrentItemId = function() {
-            return currentMaximizedItemId;
+            return currentItemId;
         };
 
         /**
@@ -348,16 +346,6 @@
         }
 
         /**
-         * Click handler for maximizing items
-         *
-         * @param {event}   The click event
-         */
-        function maximizeClick(_event) {
-            _event.preventDefault();
-            galry.maximize(_event.currentTarget);
-        }
-
-        /**
          * Handler for mouseWheel
          * @param  {event} _event The mousewheel event
          */
@@ -369,6 +357,252 @@
                 galry.next();
             }
         }
+        /**
+         * This module adds the ability to display images in an maximized lightbox
+         */
+        galry.lightbox = {};
+
+        (function() {
+
+            var maximizedGallery,
+                maximizedGalleryItems,
+                maximizedGalleryImages,
+                maximizedLayer,
+                maximizedControlNext,
+                maximizedControlPrev;
+
+            /**
+             * initialize the lightbox module
+             */
+            galry.lightbox.init = function() {
+                maximizedGallery = document.createElement('ul');
+                maximizedGalleryItems = [];
+                maximizedGalleryImages = [];
+                // create fullscreen layer
+                maximizedLayer = document.createElement('div');
+                maximizedLayer.classList.add(options.styles.maximizedLayerClassName);
+                maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
+                document.body.appendChild(maximizedLayer);
+                maximizedLayer.appendChild(maximizedGallery);
+                // create control elements
+                maximizedControlNext = document.createElement('a');
+                maximizedControlPrev = document.createElement('a');
+                maximizedControlNext.classList.add(options.styles.controlNextClassName);
+                maximizedControlPrev.classList.add(options.styles.controlPrevClassName);
+                maximizedLayer.appendChild(maximizedControlNext);
+                maximizedLayer.appendChild(maximizedControlPrev);
+                galry.addHook(galry.GALLERY_ITEM_CREATION_HOOK, itemCreationHook);
+                addEventListeners();
+            };
+
+            galry.lightbox.destroy = function() {
+                document.body.removeChild(maximizedLayer);
+                removeEventListeners();
+            };
+
+            galry.lightbox.getMaximizedLayer = function() {
+                return maximizedLayer;
+            };
+
+            galry.lightbox.getMaximizedGalleryItems = function() {
+                return maximizedGalleryItems;
+            };
+
+            galry.lightbox.getMaximizedGalleryImages = function() {
+                return maximizedGalleryImages;
+            };
+
+            /**
+             * Maximize the given item
+             *
+             * @param  {mixed} _item the item itself, or its id
+             */
+            galry.maximize = function(_item) {
+                if (typeof _item === 'number') {
+                    _item = galleryItems[_item];
+                }
+                var newItemId = parseInt(_item.getAttribute('data-id'), 10);
+                galry.goTo(newItemId);
+                // show maximized layer
+                maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
+                var currentImage = maximizedGalleryImages[currentItemId];
+                var maxWidth = window.innerWidth * 0.9;
+                if (currentImage.clientWidth > maxWidth) {
+                    var ratio = currentImage.width / currentImage.height;
+                    currentImage.style.width = maxWidth + 'px';
+                    currentImage.style.height = maxWidth / ratio + 'px';
+                }
+                fireGalryEvent('maximize', {
+                    currentItemId: currentItemId
+                });
+            };
+
+            /**
+             * Minimize the gallery
+             */
+            galry.minimize = function() {
+                maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
+            };
+
+            function itemCreationHook(_item) {
+                createMaximizedItem(_item);
+                _item.addEventListener('click', maximizeClick, false);
+            }
+
+            function createMaximizedItem(_item) {
+                var item = document.createElement('li'),
+                    image = document.createElement('img');
+                maximizedGallery.appendChild(item);
+                maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
+                maximizedGalleryItems.push(item);
+                maximizedGalleryImages.push(image);
+                item.appendChild(image);
+                item.classList.add(options.styles.elementsClassName);
+                image.addEventListener('load', setImageDimensions);
+                image.src = _item.href;
+            }
+
+            /**
+             * Click handler for maximizing items
+             *
+             * @param {event}   The click event
+             */
+            function maximizeClick(_event) {
+                _event.preventDefault();
+                galry.maximize(_event.currentTarget);
+            }
+
+            function handleChangeItem(_event) {
+                var oldItemId = _event.detail.oldItemId,
+                    newItemId = _event.detail.currentItemId;
+                // remove old classNames
+                maximizedGalleryItems[oldItemId].classList.remove(options.styles.currentItemClassName);
+                maximizedGalleryItems[getNextItemId(oldItemId)].classList.remove(options.styles.nextItemClassName);
+                maximizedGalleryItems[getPrevItemId(oldItemId)].classList.remove(options.styles.prevItemClassName);
+                // set new classNames
+                maximizedGalleryItems[newItemId].classList.add(options.styles.currentItemClassName);
+                maximizedGalleryItems[getNextItemId(newItemId)].classList.add(options.styles.nextItemClassName);
+                maximizedGalleryItems[getPrevItemId(newItemId)].classList.add(options.styles.prevItemClassName);
+                fireGalryEvent('changeMaximizedItem', {
+                    currentItemId: newItemId
+                });
+            }
+
+            /**
+             * Set max-width and max-height to the exact dimensions of the image
+             * This function should be called through an onLoad listener on the image
+             *
+             * @param {event} _event the onLoad event
+             */
+            function setImageDimensions(_event) {
+                var image = _event.target;
+                image.style.maxHeight = image.naturalHeight + 'px';
+                image.style.maxWidth = image.naturalWidth + 'px';
+            }
+
+            function addEventListeners() {
+                galry.addEventListener('changeItem', handleChangeItem);
+                document.addEventListener('keydown', handleKeyDown);
+                maximizedLayer.addEventListener('DOMMouseScroll', mouseWheelMove);
+                maximizedLayer.addEventListener('mousewheel', mouseWheelMove);
+                maximizedLayer.addEventListener('click', handleClickOnMaximizedLayer);
+                maximizedControlNext.addEventListener('click', galry.next);
+                maximizedControlPrev.addEventListener('click', galry.prev);
+            }
+
+            function removeEventListeners() {
+                galry.removeEventListener('changeItem', handleChangeItem);
+                for (var i = galleryItems.length - 1; i >= 0; i--) {
+                    galleryItems[i].removeEventListener('click', maximizeClick);
+                }
+                document.removeEventListener('keydown', handleKeyDown);
+                maximizedLayer.removeEventListener('DOMMouseScroll', mouseWheelMove);
+                maximizedLayer.removeEventListener('mousewheel', mouseWheelMove);
+                maximizedLayer.removeEventListener('click', handleClickOnMaximizedLayer);
+            }
+
+            function handleKeyDown(_event) {
+                if (_event.keyCode === 27) {
+                    galry.minimize();
+                }
+            }
+
+            /**
+             * Event Handler for clicks on the maximized layer
+             *
+             * @param  {[type]} _event The click event
+             */
+            function handleClickOnMaximizedLayer(_event) {
+                // check if that the click did not appear on the image
+                // to prevent unwanted closing
+                if (_event.target.nodeName !== 'IMG' && _event.target.nodeName !== 'A') {
+                    console.log(_event.target);
+                    galry.minimize();
+                }
+            }
+
+        })();
+
+        /**
+         * This module adds the ability to display meta text on images
+         */
+        galry.meta = {};
+
+        (function() {
+
+            var metaBoxWrapper,
+                metaBox,
+                metaText,
+                isInjected = false,
+                maximizedGalleryItems,
+                maximizedGalleryImages,
+                currentIndex,
+                pollingTimer = false;
+
+            /**
+             * initialize the meta module
+             */
+            galry.meta.init = function() {
+                metaBoxWrapper = document.createElement('div');
+                metaBox = document.createElement('div');
+                metaText = document.createElement('p');
+                metaBoxWrapper.appendChild(metaBox);
+                metaBox.appendChild(metaText);
+                metaBoxWrapper.classList.add(options.styles.metaBoxClassName);
+                galry.addEventListener('changeMaximizedItem', setCurrentMetaText);
+                maximizedGalleryItems = galry.lightbox.getMaximizedGalleryItems();
+                maximizedGalleryImages = galry.lightbox.getMaximizedGalleryImages();
+            };
+
+            function setCurrentMetaText(_event) {
+                currentIndex = _event.detail.currentItemId;
+                if (isInjected) {
+                    var boxes = galry.lightbox.getMaximizedLayer().getElementsByClassName(options.styles.metaBoxClassName);
+                    for (var i = boxes.length - 1; i >= 0; i--) {
+                        boxes[i].parentNode.removeChild(boxes[i]);
+                    }
+                    isInjected = false;
+                }
+                if (galleryItems[currentIndex].hasAttribute('data-meta')) {
+                    setDimensions();
+                    metaText.innerText = galleryItems[currentIndex].getAttribute('data-meta');
+                    maximizedGalleryItems[currentIndex].appendChild(metaBoxWrapper);
+                    isInjected = true;
+                }
+            }
+
+            function setDimensions() {
+                if (maximizedGalleryImages[currentIndex].clientWidth === 0) {
+                    pollingTimer = setTimeout(setDimensions, 1);
+                    return;
+                }
+                metaBoxWrapper.style.width = maximizedGalleryImages[currentIndex].clientWidth + 'px';
+                metaBoxWrapper.style.height = maximizedGalleryImages[currentIndex].clientHeight + 'px';
+                metaBoxWrapper.style.marginLeft = -maximizedGalleryImages[currentIndex].clientWidth / 2 + 'px';
+                metaBoxWrapper.style.marginTop = -maximizedGalleryImages[currentIndex].clientHeight / 2 + 'px';
+            }
+
+        })();
         /**
          * This module displays a panel with clickable thumbnails in fullscreen mode
          */
@@ -385,42 +619,46 @@
              */
             galry.thumbPanel.init = function() {
                 thumbWrapper = document.createElement('div');
-                thumbPanel = galleryWrapper.cloneNode(true);
-                thumbPanel.className = '';
-                // unset the id
-                thumbPanel.id = '';
-                thumbWrapper.classList.add(options.styles.thumbPanelClassName);
-                maximizedLayer.appendChild(thumbWrapper);
-                thumbWrapper.appendChild(thumbPanel);
-                thumbGalItems = thumbPanel.getElementsByClassName(options.styles.elementsClassName);
-                for (var i = thumbGalItems.length - 1; i >= 0; i--) {
-                    thumbGalItems[i].addEventListener('click', maximizeClick, false);
-                }
                 // register eventlistener to set the current item
-                galry.addEventListener('maximize', setCurrentItem);
+                galry.addEventListener('changeItem', setCurrentItem);
+                galry.addHook(galry.GALLERY_READY_HOOK, initElements);
             };
 
             galry.thumbPanel.destroy = function() {
-                maximizedLayer.removeChild(thumbWrapper);
-                galry.removeEventListener('maximize', setCurrentItem);
+                galry.lightbox.getMaximizedLayer().removeChild(thumbWrapper);
+                galry.removeEventListener('changeItem', setCurrentItem);
             };
 
             galry.thumbPanel.getThumbPanelDomNode = function() {
                 return thumbWrapper;
             };
 
+            function initElements() {
+                thumbPanel = galleryWrapper.cloneNode(true);
+                thumbPanel.className = '';
+                // unset the id
+                thumbPanel.id = '';
+                thumbWrapper.classList.add(options.styles.thumbPanelClassName);
+                galry.lightbox.getMaximizedLayer().appendChild(thumbWrapper);
+                thumbWrapper.appendChild(thumbPanel);
+                thumbGalItems = thumbPanel.getElementsByClassName(options.styles.elementsClassName);
+                for (var i = thumbGalItems.length - 1; i >= 0; i--) {
+                    thumbGalItems[i].addEventListener('click', maximizeClick, false);
+                }
+            }
+
             /**
              * Set the currently maximized item
-             * this function gets called by the galry maximize event
-             * @param {event} _event The maximize event
+             * this function gets called by the galry changeItem event
+             * @param {event} _event The changeItem event
              */
             function setCurrentItem(_event) {
-                var maximizedItems = thumbPanel.getElementsByClassName(options.styles.currentMaximizedImageClassName),
-                    currentThumbItem = thumbGalItems[_event.detail.currentMaximizedItemId];
+                var maximizedItems = thumbPanel.getElementsByClassName(options.styles.currentItemClassName),
+                    currentThumbItem = thumbGalItems[_event.detail.currentItemId];
                 for (var i = maximizedItems.length - 1; i >= 0; i--) {
-                    maximizedItems[i].classList.remove(options.styles.currentMaximizedImageClassName);
+                    maximizedItems[i].classList.remove(options.styles.currentItemClassName);
                 }
-                currentThumbItem.classList.add(options.styles.currentMaximizedImageClassName);
+                currentThumbItem.classList.add(options.styles.currentItemClassName);
                 if (currentThumbItem.offsetLeft + currentThumbItem.clientWidth > window.innerWidth) {
                     delta = window.innerWidth - currentThumbItem.offsetLeft - currentThumbItem.clientWidth;
                     setTransform(delta);
@@ -428,6 +666,16 @@
                     setTransform(0);
                     delta = 0;
                 }
+            }
+
+            /**
+             * Click handler for maximizing items
+             *
+             * @param {event}   The click event
+             */
+            function maximizeClick(_event) {
+                _event.preventDefault();
+                galry.maximize(_event.currentTarget);
             }
 
             function setTransform(delta) {
@@ -445,13 +693,17 @@
 
             var firstTouchPosition,
                 topBar,
-                closeButton;
+                closeButton,
+                maximizedLayer,
+                maximizedGalleryItems;
 
             /**
              * Initialize the touch module
              */
             galry.touch.init = function() {
                 if (isTouchSupported()) {
+                    maximizedLayer = galry.lightbox.getMaximizedLayer();
+                    maximizedGalleryItems = galry.lightbox.getMaximizedGalleryItems();
                     maximizedLayer.addEventListener('touchstart', touchstart);
                     maximizedLayer.addEventListener('touchmove', touchmove);
                     maximizedLayer.addEventListener('touchend', touchend);
@@ -496,53 +748,6 @@
 
         })();
 
-        /**
-         * This module adds the ability to display meta text on images
-         */
-        galry.meta = {};
-
-        (function() {
-
-            var metaBoxWrapper,
-                metaBox,
-                metaText,
-                isInjected = false;
-
-            /**
-             * initialize the meta module
-             */
-            galry.meta.init = function() {
-                metaBoxWrapper = document.createElement('div');
-                metaBox = document.createElement('div');
-                metaText = document.createElement('p');
-                metaBoxWrapper.appendChild(metaBox);
-                metaBox.appendChild(metaText);
-                metaBoxWrapper.classList.add(options.styles.metaBoxClassName);
-                galry.addEventListener('maximize', setCurrentMetaText);
-            };
-
-            function setCurrentMetaText(_event) {
-                var lastIndex = _event.detail.lastMaximizedItemId,
-                    currentIndex = _event.detail.currentMaximizedItemId;
-                if (isInjected) {
-                    var boxes = document.getElementsByClassName(options.styles.metaBoxClassName);
-                    for (var i = boxes.length - 1; i >= 0; i--) {
-                        boxes[i].parentNode.removeChild(boxes[i]);
-                    }
-                    isInjected = false;
-                }
-                if (galleryItems[currentIndex].hasAttribute('data-meta')) {
-                    metaText.innerText = galleryItems[currentIndex].getAttribute('data-meta');
-                    metaBoxWrapper.style.width = maximizedGalleryImages[currentIndex].clientWidth + 'px';
-                    metaBoxWrapper.style.height = maximizedGalleryImages[currentIndex].clientHeight + 'px';
-                    metaBoxWrapper.style.marginLeft = -maximizedGalleryImages[currentIndex].clientWidth / 2 + 'px';
-                    metaBoxWrapper.style.marginTop = -maximizedGalleryImages[currentIndex].clientHeight / 2 + 'px';
-                    maximizedGalleryItems[currentIndex].appendChild(metaBoxWrapper);
-                    isInjected = true;
-                }
-            }
-
-        })();
         init(this);
     }
     return galry;

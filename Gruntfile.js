@@ -24,9 +24,7 @@ module.exports = function(grunt) {
                     'src/_head.js',
                     'src/main.js',
                     'src/controls.js',
-                    'src/thumbpanel.js',
-                    'src/touch.js',
-                    'src/meta.js',
+                    'src/plugins/*.js',
                     'src/_foot.js'
                 ],
                 dest: 'dist/galry.js'
@@ -53,7 +51,7 @@ module.exports = function(grunt) {
 
         watch: {
             js: {
-                files: ['src/*.js', 'demo/*.html'],
+                files: ['src/**/*.js', 'demo/*.html'],
                 tasks: ['jshint', 'concat', 'jsbeautifier', 'uglify']
             },
             css: {

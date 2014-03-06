@@ -7,13 +7,17 @@ galry.touch = {};
 
     var firstTouchPosition,
         topBar,
-        closeButton;
+        closeButton,
+        maximizedLayer,
+        maximizedGalleryItems;
 
     /**
      * Initialize the touch module
      */
     galry.touch.init = function() {
         if (isTouchSupported()) {
+            maximizedLayer = galry.lightbox.getMaximizedLayer();
+            maximizedGalleryItems = galry.lightbox.getMaximizedGalleryItems();
             maximizedLayer.addEventListener('touchstart', touchstart);
             maximizedLayer.addEventListener('touchmove', touchmove);
             maximizedLayer.addEventListener('touchend', touchend);

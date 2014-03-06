@@ -1,20 +1,17 @@
 var galleryWrapper,
     galleryItems,
-    maximizedGallery,
-    maximizedGalleryItems,
-    maximizedGalleryImages,
-    maximizedLayer,
+    currentItemId,
     controlNext,
     controlPrev,
-    currentMaximizedItemId,
+    // TODO: each module should manage its own options
     options = {
         styles: {
             elementsClassName: 'gal-item',
             maximizedLayerHiddenClassName: 'hidden',
             maximizedLayerClassName: 'gal-maximized-layer',
-            currentMaximizedImageClassName: 'gal-current-max',
-            nextMaximizedImageClassName: 'gal-next-max',
-            prevMaximizedImageClassName: 'gal-prev-max',
+            currentItemClassName: 'gal-current-item',
+            nextItemClassName: 'gal-next-item',
+            prevItemClassName: 'gal-prev-item',
             controlNextClassName: 'gal-control-next',
             controlPrevClassName: 'gal-control-prev',
             thumbPanelClassName: 'gal-thumb-panel',
@@ -26,10 +23,18 @@ var galleryWrapper,
         closeButtonText: 'close',
         showThumbPanel: true,
         activteTouch: true,
-        showMeta: true
+        showMeta: true,
+        lightbox: true
     },
+    hooks = {},
     galry = this;
 
+galry.GALLERY_ITEM_CREATION_HOOK = 'gallery-item-creation-hook';
+galry.GALLERY_READY_HOOK = 'gallery-ready-hook';
+
+/**
+ * Bootstrap function
+ */
 function init() {
     galry.setOptions(_options);
     galleryWrapper = fetchGalleryElement(_galleryIdentifier);
@@ -54,11 +59,14 @@ galry.setOptions = function(_options) {
  * 
  */
 galry.destroy = function() {
+    if (options.lightbox && typeof galry.lightbox !== 'undefined') {
+        galry.lightbox.destroy();
+    }
     if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
         galry.thumbPanel.destroy();
     }
+    removeItemClassNames();
     removeEventListeners();
-    document.body.removeChild(maximizedLayer);
 };
 
 /**
@@ -74,41 +82,24 @@ galry.getGalleryDomNode = function() {
  * Initialize the gallery
  */
 function initGallery () {
-    maximizedGallery = document.createElement('ul');
-    maximizedGalleryItems = [];
-    maximizedGalleryImages = [];
-    maximizedLayer = document.createElement('div');
-    controlNext = document.createElement('a');
-    controlPrev = document.createElement('a');
-    currentMaximizedItemId = 0;
-    // fetch and set up gallery items
-    galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
-    for (var i = 0; i < galleryItems.length; i++) {
-        galleryItems[i].addEventListener('click', maximizeClick, false);
-        galleryItems[i].setAttribute('data-id', i);
-        var item = document.createElement('li'),
-            image = document.createElement('img');
-        maximizedGallery.appendChild(item);
-        maximizedGallery.classList.add(options.styles.maximizedGalleryClassName);
-        maximizedGalleryItems.push(item);
-        maximizedGalleryImages.push(image);
-        item.appendChild(image);
-        item.classList.add(options.styles.elementsClassName);
-        image.addEventListener('load', setImageDimensions);
-        image.src = galleryItems[i].href;
-    }
-    // create fullscreen layer
-    maximizedLayer.classList.add(options.styles.maximizedLayerClassName);
-    maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
-    document.body.appendChild(maximizedLayer);
-    maximizedLayer.appendChild(maximizedGallery);
-    // create control elements
-    controlNext.classList.add(options.styles.controlNextClassName);
-    controlPrev.classList.add(options.styles.controlPrevClassName);
-    maximizedLayer.appendChild(controlNext);
-    maximizedLayer.appendChild(controlPrev);
+    currentItemId = 0;
+    initModules();
+    fetchGalleryItems();
     // events
     initEventListeners();
+    callHooks(galry.GALLERY_READY_HOOK);
+    var evnt = new CustomEvent('ready');
+    galleryWrapper.dispatchEvent(evnt);
+}
+
+/**
+ * Init all modules
+ */
+function initModules() {
+    // TODO: this should be done in a more generic way.. ModuleManager?
+    if (options.lightbox && galry.lightbox !== 'undefined') {
+        galry.lightbox.init();
+    }
     if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
         galry.thumbPanel.init();
     }
@@ -118,34 +109,85 @@ function initGallery () {
     if (options.showMeta && typeof galry.meta !== 'undefined') {
         galry.meta.init();
     }
-    var evnt = new CustomEvent('ready');
-    galleryWrapper.dispatchEvent(evnt);
+}
+
+/**
+ * Fetch and setup all gallery items
+ */
+function fetchGalleryItems() {
+    galleryItems = galleryWrapper.getElementsByClassName(options.styles.elementsClassName);
+    for (var i = 0; i < galleryItems.length; i++) {
+        galleryItems[i].setAttribute('data-id', i);
+        callHooks(galry.GALLERY_ITEM_CREATION_HOOK, galleryItems[i]);
+    }
+    setItemClassNames();
 }
 
 /**
  * Add a listener for the galry events
  * 
- * @param {string}   eventName the name of the event
- * @param {Function} callback
+ * @param {string}   _eventName the name of the event
+ * @param {Function} _callback
  */
 galry.addEventListener = function(_eventName, _callback) {
     galleryWrapper.addEventListener(_eventName, _callback);
 };
 
+/**
+ * Remove a listener for galry events
+ * @param  {String} _eventName the name of the event
+ * @param  {[type]} _callback
+ */
 galry.removeEventListener = function(_eventName, _callback) {
     galleryWrapper.removeEventListener(_eventName, _callback);
 };
 
 /**
- * Set max-width and max-height to the exact dimensions of the image
- * This function should be called through an onLoad listener on the image
- * 
- * @param {event} _event the onLoad event
+ * This function registers a hook for _hookName
+ * @param {String}   _hookName Name of the hook
+ * @param {Function} _callback The hook callback
  */
-function setImageDimensions(_event) {
-    var image = _event.target;
-    image.style.maxHeight = image.naturalHeight + 'px';
-    image.style.maxWidth = image.naturalWidth + 'px';
+galry.addHook = function(_hookName, _callback) {
+    if (typeof hooks[_hookName] === 'undefined') {
+        hooks[_hookName] = [];
+    }
+    hooks[_hookName].push(_callback);
+};
+
+/**
+ * This function calls all hooks registered on _hookName
+ * @param  {String} _hookName Name of the hook
+ * @param  {mixed}  _hookData Any kind of data that shall be passed to the hook function
+ */
+function callHooks(_hookName, _hookData) {
+    var storedHooks = hooks[_hookName];
+    if (typeof storedHooks !== 'undefined') {
+        for (var i = storedHooks.length; i--;) {
+            storedHooks[i].call(storedHooks[i], _hookData);
+        }
+    }
+}
+
+/**
+ * This function sets classNames to indicate current, next and prev items
+ */
+function setItemClassNames() {
+    // remove currently set classnames
+    removeItemClassNames();
+    galleryItems[currentItemId].classList.add(options.styles.currentItemClassName);
+    galleryItems[getNextItemId(currentItemId)].classList.add(options.styles.nextItemClassName);
+    galleryItems[getPrevItemId(currentItemId)].classList.add(options.styles.prevItemClassName);
+}
+
+/**
+ * This function removes all classNames on galleryItems set by galry.
+ */
+function removeItemClassNames() {
+    for (var i = galleryItems.length - 1; i >= 0; i--) {
+        galleryItems[i].classList.remove(options.styles.currentItemClassName);
+        galleryItems[i].classList.remove(options.styles.nextItemClassName);
+        galleryItems[i].classList.remove(options.styles.prevItemClassName);
+    }
 }
 
 /**
@@ -168,28 +210,13 @@ function fetchGalleryElement(_galleryIdentifier) {
 /**
  * Event Handler for any keydown event
  * 
- * @param  {[type]} _event The keydown event
+ * @param  {event} _event The keydown event
  */
 function handleKeyDownEvents(_event) {
-    if (_event.keyCode == 27) {
-        galry.minimize();
-    } else if (_event.keyCode == 38 || _event.keyCode == 39) {
+    if (_event.keyCode == 38 || _event.keyCode == 39) {
         galry.next();
     } else if (_event.keyCode == 37 || _event.keyCode == 40) {
         galry.prev();
-    }
-}
-
-/**
- * Event Handler for clicks on the maximized layer
- * 
- * @param  {[type]} _event The click event
- */
-function handleClickOnMaximizedLayer(_event) {
-    // check if that the click did not appear on the image
-    // to prevent unwanted closing
-    if (_event.target.nodeName !== 'IMG' && _event.target.nodeName !== 'A') {
-        galry.minimize();
     }
 }
 
@@ -198,11 +225,6 @@ function handleClickOnMaximizedLayer(_event) {
  */
 function initEventListeners() {
     document.addEventListener('keydown', handleKeyDownEvents);
-    maximizedLayer.addEventListener('DOMMouseScroll', mouseWheelMove);
-    maximizedLayer.addEventListener('mousewheel', mouseWheelMove);
-    maximizedLayer.addEventListener('click', handleClickOnMaximizedLayer);
-    controlNext.addEventListener('click', galry.next);
-    controlPrev.addEventListener('click', galry.prev);
 }
 
 /**
@@ -212,7 +234,16 @@ function initEventListeners() {
  */
 function removeEventListeners() {
     document.removeEventListener('keydown', handleKeyDownEvents);
-    maximizedLayer.removeEventListener('DOMMouseScroll', mouseWheelMove);
-    maximizedLayer.removeEventListener('mousewheel', mouseWheelMove);
-    maximizedLayer.removeEventListener('click', handleClickOnMaximizedLayer);
+}
+
+/**
+ * This function fires a custom event on galleryWrapper
+ * @param  {String} _eventName Name of the event
+ * @param  {[type]} _detail    Detail Object passed to the eventlistener
+ */
+function fireGalryEvent(_eventName, _detail) {
+    var evnt = new CustomEvent(_eventName, {
+        detail: _detail
+    });
+    galleryWrapper.dispatchEvent(evnt);
 }
