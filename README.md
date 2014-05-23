@@ -1,4 +1,4 @@
-# galry
+# galry [![Build Status](https://travis-ci.org/kaesetoast/galry.svg?branch=master)](http://travis-ci.org/kaesetoast/galry)
 
 galry is a very simple HTML5 image gallery slider
 
