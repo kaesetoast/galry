@@ -28,9 +28,14 @@ module.exports = function(config) {
       'src/**/*.js': 'coverage'
     },
 
+    coverageReporter: {
+      type: 'lcov',
+      dir: 'coverage/'
+    },
+
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', 'coverage', 'coveralls'],
 
 
     // web server port
