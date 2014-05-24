@@ -6,7 +6,6 @@ galry.touch = {};
 (function() {
 
     var firstTouchPosition,
-        topBar,
         closeButton,
         maximizedLayer,
         maximizedGalleryItems;
@@ -22,19 +21,16 @@ galry.touch = {};
             maximizedLayer.addEventListener('touchmove', touchmove);
             maximizedLayer.addEventListener('touchend', touchend);
             maximizedLayer.classList.add('touch-supported');
-            initTopBar();
-            closeButton.addEventListener('click', galry.minimize);
+            initCloseButton();
         }
     };
 
-    function initTopBar() {
-        topBar = document.createElement('div');
+    function initCloseButton() {
         closeButton = document.createElement('a');
         closeButton.innerText = options.closeButtonText;
         closeButton.classList.add(options.styles.closeButtonClassName);
-        topBar.appendChild(closeButton);
-        topBar.classList.add(options.styles.topBarClassName);
-        maximizedLayer.appendChild(topBar);
+        maximizedLayer.appendChild(closeButton);
+        closeButton.addEventListener('click', galry.minimize);
     }
 
     function touchstart(_event) {

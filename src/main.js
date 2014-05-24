@@ -20,7 +20,7 @@ var galleryWrapper,
             topBarClassName: 'gal-top-bar',
             metaBoxClassName: 'gal-meta-box'
         },
-        closeButtonText: 'close',
+        closeButtonText: 'X',
         showThumbPanel: true,
         activteTouch: true,
         showMeta: true,
