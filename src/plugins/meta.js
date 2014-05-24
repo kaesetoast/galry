@@ -5,6 +5,8 @@ galry.meta = {};
 
 (function() {
 
+    'use strict';
+
     var metaBoxWrapper,
         metaBox,
         metaText,

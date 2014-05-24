@@ -4,6 +4,9 @@
 galry.thumbPanel = {};
 
 (function() {
+
+    'use strict';
+
     var thumbWrapper,
         thumbPanel,
         thumbGalItems,

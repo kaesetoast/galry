@@ -5,6 +5,8 @@ galry.touch = {};
 
 (function() {
 
+    'use strict';
+
     var firstTouchPosition,
         closeButton,
         maximizedLayer,

@@ -1,8 +1,6 @@
 var galleryWrapper,
     galleryItems,
     currentItemId,
-    controlNext,
-    controlPrev,
     // TODO: each module should manage its own options
     options = {
         styles: {

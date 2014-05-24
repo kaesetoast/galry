@@ -17,8 +17,6 @@
         var galleryWrapper,
             galleryItems,
             currentItemId,
-            controlNext,
-            controlPrev,
             // TODO: each module should manage its own options
             options = {
                 styles: {
@@ -364,6 +362,8 @@
 
         (function() {
 
+            'use strict';
+
             var maximizedGallery,
                 maximizedGalleryItems,
                 maximizedGalleryImages,
@@ -550,6 +550,8 @@
 
         (function() {
 
+            'use strict';
+
             var metaBoxWrapper,
                 metaBox,
                 metaText,
@@ -609,6 +611,9 @@
         galry.thumbPanel = {};
 
         (function() {
+
+            'use strict';
+
             var thumbWrapper,
                 thumbPanel,
                 thumbGalItems,
@@ -690,6 +695,8 @@
         galry.touch = {};
 
         (function() {
+
+            'use strict';
 
             var firstTouchPosition,
                 closeButton,

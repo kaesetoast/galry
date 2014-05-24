@@ -5,6 +5,8 @@ galry.lightbox = {};
 
 (function() {
 
+    'use strict';
+
     var maximizedGallery,
         maximizedGalleryItems,
         maximizedGalleryImages,
