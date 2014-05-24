@@ -1,48 +1,49 @@
-@import "compass/css3";
+@import 'compass/css3';
 
 .gal-maximized-layer {
-    background-color: rgba(0, 0, 0, 0.9);
-    width: 100%;
+    background-color: rgba(0, 0, 0, .9);
     height: 100%;
-    position: fixed;
-    top: 0;
     left: 0;
     overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
     &.hidden {
         display: none;
     }
     .gal-item {
         margin: 0;
     }
-    .gal-control-next, .gal-control-prev {
-        width: 4em;
-        height: 4em;
-        display: block;
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.8);
-        border: 1px solid white;
+    .gal-control-next,
+    .gal-control-prev {
         @include border-radius(2em);
         @include box-shadow(0 0 5px #000);
-        @include transition(opacity 0.4s ease);
-        top: 50%;
-        margin-top: -2em;
+        @include transition(opacity .4s ease);
+        background-color: rgba(0, 0, 0, .8);
+        border: 1px solid #fff;
         cursor: pointer;
-        opacity: 0.1;
+        display: block;
+        height: 4em;
+        margin-top: -2em;
+        opacity: .1;
+        position: absolute;
+        top: 50%;
+        width: 4em;
         &:hover {
             opacity: 1;
         }
         &:after {
+            color: #fff;
             content: '>';
             display: block;
-            color: white;
-            width: 2em;
-            height: 2em;
             font-size: 2em;
+            height: 2em;
+            left: 0;
             line-height: 2em;
             position: absolute;
-            top: 0;
-            left: 0;
             text-align: center;
+            top: 0;
+            width: 2em;
         }
     }
     .gal-control-prev {
@@ -53,8 +54,8 @@
         right: 2em;
     }
     .gal-thumb-panel {
-        overflow: hidden;
         display: none;
+        overflow: hidden;
         @media only screen and (min-width: 768px) {
             display: block;
         }
@@ -62,41 +63,42 @@
             bottom: 0;
             opacity: 1;
         }
-        opacity: 0.6;
-        @include transition(all 0.5s ease);
-        height: 60px;
-        padding: 4px 0;
-        width: 100%;
-        position: absolute;
-        margin: 0;
+        @include transition(all .5s ease);
+        background-color: #000;
         bottom: -40px;
-        background-color: black;
+        height: 60px;
+        margin: 0;
+        opacity: .6;
+        padding: 4px 0;
+        position: absolute;
+        width: 100%;
         ul {
-            @include transition(all 0.5s ease);
-            min-width: 200%;
-            margin: 0;
-            padding: 0;
+            @include transition(all .5s ease);
             height: 100%;
+            margin: 0;
+            min-width: 200%;
+            padding: 0;
             li {
                 display: inline-block;
-                margin: 0 1px;
                 height: 100%;
-                .gal-item {
-                    display: block;
-                    height: 100%;
-                    outline-style: none;
-                    img {
-                        height: 100%;
-                        width: auto;
-                        opacity: 0.2;
-                        @include box-shadow(none);
-                        @include transition(opacity 0.5s ease);
-                    }
-                    &:hover, &.gal-current-item {
-                        img {
-                            opacity: 0.9;
-                        }
-                    }
+                margin: 0 1px;
+            }
+        }
+        .gal-item {
+            display: block;
+            height: 100%;
+            outline-style: none;
+            img {
+                height: 100%;
+                width: auto;
+                opacity: .2;
+                @include box-shadow(none);
+                @include transition(opacity .5s ease);
+            }
+            &:hover,
+            &.gal-current-item {
+                img {
+                    opacity: .9;
                 }
             }
         }
@@ -107,70 +109,73 @@
             opacity: 1;
         }
         .gal-close-button {
-            position: absolute;
-            top: .5em;
-            right: .8em;
-            display: inline-block;
-            font-size: 25px;
-            padding: .2em;
-            line-height: 1em;
-            width: 1em;
-            height: 1em;
-            background-color: white;
-            margin: 5px;
-            text-align: center;
-            font-family: sans;
             @include border-radius(50%);
+            background-color: #fff;
+            display: inline-block;
+            font-family: sans;
+            font-size: 25px;
+            height: 1em;
+            line-height: 1em;
+            margin: 5px;
+            padding: .2em;
+            position: absolute;
+            right: .8em;
+            text-align: center;
+            top: .5em;
+            width: 1em;
         }
     }
     ul.gal-maximized-gallery {
         padding: 0;
         .gal-item {
+            @include transition(all .5s ease);
             display: none;
-            @include transition(all 0.5s ease);
-            width: 100%;
             height: 100%;
+            left: 0;
             position: absolute;
             top: 0;
-            left: 0;
+            width: 100%;
             img {
+                border: 2px solid #fff;
+                bottom: 0;
                 height: 90%;
-                border: 2px solid white;
+                left: 0;
                 margin: auto;
                 position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
                 right: 0;
+                top: 0;
             }
-            .gal-meta-box {
-                pointer-events: none;
-                background-color: transparent;
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                margin: 0;
-                div {
-                    background-color: rgba(0, 0, 0, 0.7);
-                    position: absolute;
-                    bottom: 0;
-                    width: 100%;
-                    p {
-                        color: white;
-                    }
-                }
-            }
-            &.gal-current-item, &.gal-next-item, &.gal-prev-item {
+            &.gal-current-item,
+            &.gal-next-item,
+            &.gal-prev-item {
                 display: block;
             }
-            &.gal-next-item, &.gal-prev-item {
+            &.gal-next-item,
+            &.gal-prev-item {
                 opacity: 0;
             }
             &.gal-prev-item {
-                @include transform(translateX(-150%) scale(0.7));
+                @include transform(translateX(-150%) scale(.7));
             }
             &.gal-next-item {
-                @include transform(translateX(150%) scale(0.7));
+                @include transform(translateX(150%) scale(.7));
+            }
+        }
+        .gal-meta-box {
+            pointer-events: none;
+            background-color: transparent;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: 0;
+            div {
+                background-color: rgba(0, 0, 0, .7);
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                p {
+                    color: #fff;
+                }
             }
         }
     }
