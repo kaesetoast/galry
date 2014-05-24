@@ -177,7 +177,6 @@ galry.lightbox = {};
         // check if that the click did not appear on the image
         // to prevent unwanted closing
         if (_event.target.nodeName !== 'IMG' && _event.target.nodeName !== 'A') {
-            console.log(_event.target);
             galry.minimize();
         }
     }
