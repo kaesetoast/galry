@@ -54,8 +54,17 @@
         right: 2em;
     }
     .gal-thumb-panel {
+        @include transition(all .5s ease);
+        background-color: #000;
+        bottom: -40px;
         display: none;
+        height: 60px;
+        margin: 0;
+        opacity: .6;
         overflow: hidden;
+        padding: 4px 0;
+        position: absolute;
+        width: 100%;
         @media only screen and (min-width: 768px) {
             display: block;
         }
@@ -63,43 +72,32 @@
             bottom: 0;
             opacity: 1;
         }
-        @include transition(all .5s ease);
-        background-color: #000;
-        bottom: -40px;
-        height: 60px;
-        margin: 0;
-        opacity: .6;
-        padding: 4px 0;
-        position: absolute;
-        width: 100%;
         ul {
             @include transition(all .5s ease);
             height: 100%;
             margin: 0;
             min-width: 200%;
             padding: 0;
-            li {
-                display: inline-block;
-                height: 100%;
-                margin: 0 1px;
-            }
+        }
+        li {
+            display: inline-block;
+            height: 100%;
+            margin: 0 1px;
         }
         .gal-item {
             display: block;
             height: 100%;
             outline-style: none;
             img {
-                height: 100%;
-                width: auto;
-                opacity: .2;
                 @include box-shadow(none);
                 @include transition(opacity .5s ease);
+                height: 100%;
+                opacity: .2;
+                width: auto;
             }
-            &:hover,
-            &.gal-current-item {
-                img {
-                    opacity: .9;
-                }
+            &:hover img,
+            &.gal-current-item img {
+                opacity: .9;
             }
         }
     }
@@ -162,16 +160,16 @@
             }
         }
         .gal-meta-box {
-            pointer-events: none;
             background-color: transparent;
-            position: absolute;
             left: 50%;
-            top: 50%;
             margin: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 50%;
             div {
                 background-color: rgba(0, 0, 0, .7);
-                position: absolute;
                 bottom: 0;
+                position: absolute;
                 width: 100%;
                 p {
                     color: #fff;
