@@ -20,7 +20,7 @@ var galleryWrapper,
         },
         closeButtonText: 'X',
         showThumbPanel: true,
-        activteTouch: true,
+        activateTouch: true,
         showMeta: true,
         lightbox: true
     },
@@ -101,7 +101,7 @@ function initModules() {
     if (options.showThumbPanel && typeof galry.thumbPanel !== 'undefined') {
         galry.thumbPanel.init();
     }
-    if (options.activteTouch && typeof galry.touch !== 'undefined') {
+    if (options.activateTouch && typeof galry.touch !== 'undefined') {
         galry.touch.init();
     }
     if (options.showMeta && typeof galry.meta !== 'undefined') {
