@@ -68,13 +68,7 @@ galry.lightbox = {};
         galry.goTo(newItemId);
         // show maximized layer
         maximizedLayer.classList.remove(options.styles.maximizedLayerHiddenClassName);
-        var currentImage = maximizedGalleryImages[currentItemId];
-        var maxWidth = window.innerWidth * 0.9;
-        if (currentImage.clientWidth > maxWidth) {
-            var ratio = currentImage.width / currentImage.height;
-            currentImage.style.width = maxWidth + 'px';
-            currentImage.style.height = maxWidth / ratio + 'px';
-        }
+        adjustImageSize();
         fireGalryEvent('maximize', {
             currentItemId: currentItemId
         });
@@ -86,6 +80,16 @@ galry.lightbox = {};
     galry.minimize = function () {
         maximizedLayer.classList.add(options.styles.maximizedLayerHiddenClassName);
     };
+
+    function adjustImageSize() {
+        var currentImage = maximizedGalleryImages[currentItemId];
+        var maxWidth = window.innerWidth * 0.9;
+        if (currentImage.clientWidth > maxWidth) {
+            var ratio = currentImage.width / currentImage.height;
+            currentImage.style.width = maxWidth + 'px';
+            currentImage.style.height = maxWidth / ratio + 'px';
+        }
+    }
 
     function itemCreationHook(_item) {
         createMaximizedItem(_item);
@@ -126,6 +130,7 @@ galry.lightbox = {};
         maximizedGalleryItems[newItemId].classList.add(options.styles.currentItemClassName);
         maximizedGalleryItems[getNextItemId(newItemId)].classList.add(options.styles.nextItemClassName);
         maximizedGalleryItems[getPrevItemId(newItemId)].classList.add(options.styles.prevItemClassName);
+        adjustImageSize();
         fireGalryEvent('changeMaximizedItem', {currentItemId: newItemId});
     }
 
