@@ -45,12 +45,28 @@ function init() {
  * @param {object} _options the option object
  */
 galry.setOptions = function(_options) {
-    for (var option in _options) {
-        if (options[option]) {
-            options[option] = _options[option];
+    for (var optionName in _options) {
+        if (options[optionName]) {
+            options[optionName] = setOption(options[optionName], _options[optionName]);
         }
     }
 };
+
+function setOption(currentOption, newOption) {
+    if (typeof currentOption === 'object') {
+        var returnValue = {};
+        for (var optionName in currentOption) {
+            returnValue[optionName] = setOption(currentOption[optionName], newOption[optionName]);
+        }
+        return returnValue;
+    } else {
+        if (typeof newOption !== 'undefined') {
+            return newOption;
+        } else {
+            return currentOption;
+        }
+    }
+}
 
 /**
  * This function destroys the galry instance and cleans up the DOM

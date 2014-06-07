@@ -41,6 +41,14 @@ describe('main - constructor tests', function() {
         });
 
     });
+
+    describe('check overwriting of default options', function () {
+        it('should be able to overwrite the maximized-layer classname', function() {
+            var domNode = document.getElementById('gallery');
+            gallery = new galry(domNode, {styles: {maximizedGalleryClassName: 'renamed-maximized-layer'}});
+            expect(document.getElementsByClassName('renamed-maximized-layer').length).toBeGreaterThan(0);
+        });
+    });
 });
 
 describe('main - test the rest', function() {
