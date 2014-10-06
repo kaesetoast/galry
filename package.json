@@ -30,7 +30,7 @@
     "requirejs": "~2.1.10"
   },
   "scripts": {
-    "test": "./node_modules/.bin/karma start --browsers Firefox --single-run"
+    "test": "./node_modules/.bin/karma start --browsers Firefox --single-run cat ./coverage/lcov.info ./coverage/karma/**/*.info > lcov.info node node_modules/lcov-filter/index.js lcov.info config | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "licenses": [
     {
