@@ -272,14 +272,14 @@
          * @param  {[type]} _detail    Detail Object passed to the eventlistener
          */
         function fireGalryEvent(_eventName, _detail) {
-            var evnt = new CustomEvent(_eventName, {
-                detail: _detail
-            });
-            galleryWrapper.dispatchEvent(evnt);
-        }
-        /**
-         * Go to the next item in line
-         */
+                var evnt = new CustomEvent(_eventName, {
+                    detail: _detail
+                });
+                galleryWrapper.dispatchEvent(evnt);
+            }
+            /**
+             * Go to the next item in line
+             */
         galry.next = function() {
             var nextItemId = getNextItemId(currentItemId);
             galry.goTo(galleryItems[nextItemId]);
@@ -364,16 +364,16 @@
          * @param  {event} _event The mousewheel event
          */
         function mouseWheelMove(_event) {
-            _event.preventDefault();
-            if (Math.max(-1, Math.min(1, (_event.wheelDelta || -_event.detail))) > 0) {
-                galry.prev();
-            } else {
-                galry.next();
+                _event.preventDefault();
+                if (Math.max(-1, Math.min(1, (_event.wheelDelta || -_event.detail))) > 0) {
+                    galry.prev();
+                } else {
+                    galry.next();
+                }
             }
-        }
-        /**
-         * This module adds the ability to display images in an maximized lightbox
-         */
+            /**
+             * This module adds the ability to display images in an maximized lightbox
+             */
         galry.lightbox = {};
 
         (function() {
