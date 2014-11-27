@@ -21,15 +21,15 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-      
+
     ],
 
     preprocessors: {
-      'src/**/*.js': 'coverage'
+      'dist/galry.js': 'coverage'
     },
 
     coverageReporter: {
-      type: 'lcov',
+      type: 'lcovonly',
       dir: 'coverage/'
     },
 
